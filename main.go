@@ -12,12 +12,14 @@ func main() {
 	// Load environment variables
 	setupEnvironment()
 
-	dbService, err := db.Setup(os.Getenv("DB_CONNECTION_STRING"))
+	// Set up database instance
+	db, err := db.Setup(os.Getenv("DB_CONNECTION_STRING"))
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	dbService.Ping()
+	// Test database connection
+	db.Ping()
 }
 
 func setupEnvironment() {
