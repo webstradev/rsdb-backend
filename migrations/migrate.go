@@ -1,6 +1,7 @@
 package migrations
 
-// This migrations solution is a fork of https://github.com/joncalhoun/migrate with some small adjustments to some of the database queries
+// This migrations solution is a fork of https://github.com/joncalhoun/migrate
+// with some small adjustments to some of the database queries to better fit this application
 
 import (
 	"database/sql"
