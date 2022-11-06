@@ -6,6 +6,7 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/webstradev/rsdb-backend/db"
+	"github.com/webstradev/rsdb-backend/migrations"
 )
 
 func main() {
@@ -13,13 +14,19 @@ func main() {
 	setupEnvironment()
 
 	// Set up database instance
-	db, err := db.Setup(os.Getenv("DB_CONNECTION_STRING"))
+	db, err := db.Setup(os.Getenv("DB_CONNECTION_STRING"), &migrations.SQLMigration)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// Test database connection
 	db.Ping()
+
+	// Migrate Database
+	err = db.Migrate()
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func setupEnvironment() {
