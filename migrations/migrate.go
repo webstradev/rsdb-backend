@@ -109,12 +109,12 @@ func (s *Sqlx) runMigration(db *sqlx.DB, m SqlxMigration) error {
 	if err != nil {
 		return errorf(err)
 	}
-	_, err = db.Exec("INSERT INTO migrations (id) VALUES (?)", m.ID)
+	err = m.Migrate(tx)
 	if err != nil {
 		tx.Rollback()
 		return errorf(err)
 	}
-	err = m.Migrate(tx)
+	_, err = db.Exec("INSERT INTO migrations (id) VALUES (?)", m.ID)
 	if err != nil {
 		tx.Rollback()
 		return errorf(err)
@@ -133,12 +133,12 @@ func (s *Sqlx) runRollback(db *sqlx.DB, m SqlxMigration) error {
 	if err != nil {
 		return errorf(err)
 	}
-	_, err = db.Exec("DELETE FROM migrations WHERE id=?", m.ID)
+	err = m.Rollback(tx)
 	if err != nil {
 		tx.Rollback()
 		return errorf(err)
 	}
-	err = m.Rollback(tx)
+	_, err = db.Exec("DELETE FROM migrations WHERE id=?", m.ID)
 	if err != nil {
 		tx.Rollback()
 		return errorf(err)
