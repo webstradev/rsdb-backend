@@ -12,13 +12,16 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	"github.com/webstradev/rsdb-backend/auth"
+	"github.com/webstradev/rsdb-backend/controllers"
 	"github.com/webstradev/rsdb-backend/db"
 	"github.com/webstradev/rsdb-backend/migrations"
+	"github.com/webstradev/rsdb-backend/utils"
 )
 
 func main() {
 	// Load environment variables
-	setupEnvironment()
+	loadEnvironmentVariables()
 
 	// Set up database instance
 	db, err := db.Setup(os.Getenv("DB_CONNECTION_STRING"), &migrations.SQLMigration)
@@ -35,14 +38,23 @@ func main() {
 		log.Fatal(err)
 	}
 
+	// Initialize Environment
+	env := &utils.Environment{
+		DB:  db,
+		JWT: auth.CreateJWTService(os.Getenv("JWT_SIGNING_SECRET"), "JWT_ISSUER", 24*time.Hour),
+	}
+
 	// Initialise router
 	router := gin.Default()
 
 	// Health check for k8s
 	router.GET("/health", func(c *gin.Context) {
-		time.Sleep(5 * time.Second)
 		c.Status(http.StatusOK)
 	})
+
+	api := router.Group("/api")
+
+	api.POST("/login", controllers.Login(env))
 
 	// Server object
 	s := &http.Server{
@@ -76,11 +88,10 @@ func main() {
 	}
 
 	log.Println("Server exiting.")
-
 }
 
-func setupEnvironment() {
-	// If a database connection string is not yet set in environment variables load the .env file
+func loadEnvironmentVariables() {
+	// If a database connection string is not yet set in environment variables (or by kube secrets) then load the .env file
 	if os.Getenv("DB_CONNECTION_STRING") == "" {
 		err := godotenv.Load(".env")
 		if err != nil {
