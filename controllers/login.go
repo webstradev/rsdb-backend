@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -41,7 +40,6 @@ func Login(env *utils.Environment) gin.HandlerFunc {
 		token, err := env.JWT.GenerateJWTToken(user.ID, user.Role)
 		if err != nil {
 			c.AbortWithStatus(http.StatusInternalServerError)
-			log.Println(err)
 			return
 		}
 
