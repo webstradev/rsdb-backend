@@ -38,10 +38,15 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// Initialize Environment
+	jwtService, err := auth.CreateJWTService(os.Getenv("JWT_SIGNING_SECRET"), os.Getenv("JWT_ISSUER"), 24*time.Hour)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Initialize Environment (for dependency injection)
 	env := &utils.Environment{
 		DB:  db,
-		JWT: auth.CreateJWTService(os.Getenv("JWT_SIGNING_SECRET"), "JWT_ISSUER", 24*time.Hour),
+		JWT: jwtService,
 	}
 
 	// Initialise router

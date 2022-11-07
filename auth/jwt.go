@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"errors"
 	"time"
 
 	"github.com/golang-jwt/jwt"
@@ -17,8 +18,11 @@ type JWTService struct {
 	maxAge        time.Duration
 }
 
-func CreateJWTService(signingSecret, issuer string, maxAge time.Duration) *JWTService {
-	return &JWTService{signingSecret: signingSecret, issuer: issuer, maxAge: maxAge}
+func CreateJWTService(signingSecret, issuer string, maxAge time.Duration) (*JWTService, error) {
+	if signingSecret == "" || issuer == "" {
+		return nil, errors.New("missing signing secret or issuer in environment variables")
+	}
+	return &JWTService{signingSecret: signingSecret, issuer: issuer, maxAge: maxAge}, nil
 }
 
 func (j *JWTService) GenerateJWTToken(userId int64, role string) (string, error) {
