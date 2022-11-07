@@ -15,6 +15,7 @@ import (
 	"github.com/webstradev/rsdb-backend/auth"
 	"github.com/webstradev/rsdb-backend/controllers"
 	"github.com/webstradev/rsdb-backend/db"
+	"github.com/webstradev/rsdb-backend/middlewares"
 	"github.com/webstradev/rsdb-backend/migrations"
 	"github.com/webstradev/rsdb-backend/utils"
 )
@@ -57,9 +58,10 @@ func main() {
 		c.Status(http.StatusOK)
 	})
 
-	api := router.Group("/api")
+	router.POST("/api/login", controllers.Login(env))
 
-	api.POST("/login", controllers.Login(env))
+	api := router.Group("/api")
+	api.Use(middlewares.JWTAuthMiddleware(env))
 
 	// Server object
 	s := &http.Server{
