@@ -4,10 +4,10 @@ CREATE TABLE `projects` (
 	`modified_at` DATETIME NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
 	`deleted_at` DATETIME NULL DEFAULT NULL,
 	`title` VARCHAR(255) NOT NULL COLLATE 'utf8mb4_general_ci',
-	`description` VARCHAR(255) NOT NULL,
-	`link` VARCHAR(255) NOT NULL,
-	`date` DATETIME NOT NULL,
-	`body` LONGTEXT NOT NULL,
+	`description` TEXT NOT NULL COLLATE 'utf8mb4_general_ci',
+	`link` TEXT NOT NULL COLLATE 'utf8mb4_general_ci',
+	`date` DATE NULL DEFAULT NULL,
+	`body` LONGTEXT NOT NULL COLLATE 'utf8mb4_general_ci',
 	PRIMARY KEY (`id`) USING BTREE
 )
 COLLATE='utf8mb4_general_ci'
