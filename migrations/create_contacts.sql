@@ -15,7 +15,7 @@ CREATE TABLE `contacts` (
 	`privacy` VARCHAR(100) NOT NULL DEFAULT '',
 	PRIMARY KEY (`id`) USING BTREE,
 	INDEX `contacts_platforms_Fk` (`platform_id`) USING BTREE,
-	CONSTRAINT `contacts_platforms_Fk` FOREIGN KEY (`platform_id`) REFERENCES `restorebackup`.`platforms` (`id`) ON UPDATE CASCADE ON DELETE RESTRICT
+	CONSTRAINT `contacts_platforms_Fk` FOREIGN KEY (`platform_id`) REFERENCES `platforms` (`id`) ON UPDATE CASCADE ON DELETE RESTRICT
 )
 COLLATE='utf8mb4_general_ci'
 ENGINE=InnoDB
