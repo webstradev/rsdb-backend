@@ -21,6 +21,10 @@ func Setup(dsn string, migrator *migrations.Sqlx) (*Database, error) {
 	return &Database{querier: db, migrator: migrator}, nil
 }
 
+func SetupMockDB(mockDb *sqlx.DB) *Database {
+	return &Database{querier: mockDb}
+}
+
 func (db *Database) Ping() error {
 	err := db.querier.Ping()
 	if err != nil {
