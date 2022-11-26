@@ -25,7 +25,7 @@ func main() {
 	loadEnvironmentVariables()
 
 	// Set up database instance
-	db, err := db.Setup(os.Getenv("DB_CONNECTION_STRING"), &migrations.SQLMigration)
+	db, err := db.Setup(os.Getenv("DB_CONNECTION_STRING"), migrations.LoadMigrations())
 	if err != nil {
 		log.Fatal(err)
 	}
