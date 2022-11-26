@@ -6,7 +6,7 @@ package migrations
 import (
 	"database/sql"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 
 	"github.com/jmoiron/sqlx"
@@ -196,7 +196,7 @@ func SqlxFileMigration(id, upFile, downFile string) SqlxMigration {
 			// think it makes more sense to panic here.
 			panic(err)
 		}
-		fileBytes, err := ioutil.ReadAll(f)
+		fileBytes, err := io.ReadAll(f)
 		if err != nil {
 			panic(err)
 		}
