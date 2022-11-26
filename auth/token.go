@@ -7,6 +7,11 @@ import (
 	"github.com/golang-jwt/jwt"
 )
 
+type JWTServicer interface {
+	GenerateJWTToken(userId int64, role string) (string, error)
+	ValidateJWTToken(signedString string) (*TokenData, error)
+}
+
 type TokenData struct {
 	UserID int64  `json:"user_id"`
 	Role   string `json:"role"`
