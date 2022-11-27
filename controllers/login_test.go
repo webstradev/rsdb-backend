@@ -108,7 +108,7 @@ func TestLogin(t *testing.T) {
 			},
 			http.StatusOK,
 			`{"email": "test", "password": "test"}`,
-			`{"token":"tokenstring"}`,
+			`{"token":"usertoken"}`,
 		},
 	}
 

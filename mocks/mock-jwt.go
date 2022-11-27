@@ -19,32 +19,27 @@ func (j *MockJWTService) GenerateJWTToken(userId int64, role string) (string, er
 	if userId == 0 {
 		return "", jwt.NewValidationError("Invalid userID in JWT token", 0)
 	}
+
+	if role == "admin" {
+		return "admintoken", nil
+	}
+
+	if role == "user" {
+		return "usertoken", nil
+	}
+
 	return "tokenstring", nil
 }
 
 func (j *MockJWTService) ValidateJWTToken(signedString string) (*auth.TokenData, error) {
-	// Parse token
-	token, err := jwt.Parse(signedString, func(token *jwt.Token) (any, error) {
-		// First validate the algorithm signature
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, jwt.NewValidationError("Invalid JWT token", 0)
-		}
-
-		return []byte(j.signingSecret), nil
-	})
-
-	if err != nil {
-		return nil, err
+	if signedString == "admintoken" {
+		return &auth.TokenData{UserID: 1, Role: "admin"}, nil
 	}
 
-	// Check claims and if token is valid
-	claims, ok := token.Claims.(jwt.MapClaims)
-	if !ok || !token.Valid {
-		return nil, jwt.NewValidationError("Invalid JWT token", 0)
+	if signedString == "usertoken" {
+		return &auth.TokenData{UserID: 1, Role: "user"}, nil
 	}
 
-	data := auth.TokenData{}
-	data.SetClaims(claims)
+	return nil, jwt.NewValidationError("Invalid JWT token", 0)
 
-	return &data, nil
 }
