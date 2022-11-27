@@ -15,3 +15,9 @@ type ModelLite struct {
 	ModifiedAt time.Time    `json:"modifiedAt" db:"modified_at"`
 	DeletedAt  sql.NullTime `json:"deletedAt" db:"deleted_at"`
 }
+
+func (db *Database) CountRowsForTable(table string) (int, error) {
+	var count int
+	err := db.querier.Get(&count, "SELECT COUNT(*) AS count FROM ?", table)
+	return count, err
+}
