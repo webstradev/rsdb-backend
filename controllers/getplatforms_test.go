@@ -38,28 +38,28 @@ func TestGetPlatforms(t *testing.T) {
 			1,
 			2,
 			func(mock sqlmock.Sqlmock) {
-				rows := sqlmock.NewRows([]string{"id", "name", "website", "country", "source", "notes", "comments", "contacts_count", "articles_count", "projects_count", "platform_categories"}).
-					AddRow(1, "test", "test", "test", "test", "test", "test", 1, 1, 1, "test").
-					AddRow(2, "test", "test", "test", "test", "test", "test", 1, 1, 1, "test")
+				rows := sqlmock.NewRows([]string{"id", "name", "website", "country", "source", "notes", "comment", "privacy", "contacts_count", "articles_count", "projects_count", "platform_categories"}).
+					AddRow(1, "test", "test", "test", "test", "test", "test", "test", 1, 1, 1, "test").
+					AddRow(2, "test", "test", "test", "test", "test", "test", "test", 1, 1, 1, "test")
 				mock.ExpectQuery("SELECT p.(.+) FROM platforms").WithArgs(2, 0).WillReturnRows(rows)
 			},
 			http.StatusOK,
-			`[{"id":1,"createdAt":"0001-01-01T00:00:00Z","modifiedAt":"0001-01-01T00:00:00Z","deletedAt":{"Time":"0001-01-01T00:00:00Z","Valid":false},"name":"test","website":"test","country":"test","source":"test","notes":"test","comments":"test","categories":"test","contactsCount":1,"articlesCount":1,"projectsCount":1},{"id":2,"createdAt":"0001-01-01T00:00:00Z","modifiedAt":"0001-01-01T00:00:00Z","deletedAt":{"Time":"0001-01-01T00:00:00Z","Valid":false},"name":"test","website":"test","country":"test","source":"test","notes":"test","comments":"test","categories":"test","contactsCount":1,"articlesCount":1,"projectsCount":1}]`,
+			`[{"id":1,"createdAt":"0001-01-01T00:00:00Z","modifiedAt":"0001-01-01T00:00:00Z","deletedAt":{"Time":"0001-01-01T00:00:00Z","Valid":false},"name":"test","website":"test","country":"test","source":"test","notes":"test","privacy":"test","comment":"test","categories":"test","contactsCount":1,"articlesCount":1,"projectsCount":1},{"id":2,"createdAt":"0001-01-01T00:00:00Z","modifiedAt":"0001-01-01T00:00:00Z","deletedAt":{"Time":"0001-01-01T00:00:00Z","Valid":false},"name":"test","website":"test","country":"test","source":"test","notes":"test","privacy":"test","comment":"test","categories":"test","contactsCount":1,"articlesCount":1,"projectsCount":1}]`,
 		},
 		{
 			"GetPlatforms - 4 platforms from page 2",
 			2,
 			4,
 			func(mock sqlmock.Sqlmock) {
-				rows := sqlmock.NewRows([]string{"id", "name", "website", "country", "source", "notes", "comments", "contacts_count", "articles_count", "projects_count", "platform_categories"}).
-					AddRow(3, "test", "test", "test", "test", "test", "test", 1, 1, 1, "test").
-					AddRow(4, "test", "test", "test", "test", "test", "test", 1, 1, 1, "test").
-					AddRow(5, "test", "test", "test", "test", "test", "test", 1, 1, 1, "test").
-					AddRow(6, "test", "test", "test", "test", "test", "test", 1, 1, 1, "test")
+				rows := sqlmock.NewRows([]string{"id", "name", "website", "country", "source", "notes", "comment", "privacy", "contacts_count", "articles_count", "projects_count", "platform_categories"}).
+					AddRow(3, "test", "test", "test", "test", "test", "test", "test", 1, 1, 1, "test").
+					AddRow(4, "test", "test", "test", "test", "test", "test", "test", 1, 1, 1, "test").
+					AddRow(5, "test", "test", "test", "test", "test", "test", "test", 1, 1, 1, "test").
+					AddRow(6, "test", "test", "test", "test", "test", "test", "test", 1, 1, 1, "test")
 				mock.ExpectQuery("SELECT p.(.+) FROM platforms").WithArgs(4, 4).WillReturnRows(rows)
 			},
 			http.StatusOK,
-			`[{"id":3,"createdAt":"0001-01-01T00:00:00Z","modifiedAt":"0001-01-01T00:00:00Z","deletedAt":{"Time":"0001-01-01T00:00:00Z","Valid":false},"name":"test","website":"test","country":"test","source":"test","notes":"test","comments":"test","categories":"test","contactsCount":1,"articlesCount":1,"projectsCount":1},{"id":4,"createdAt":"0001-01-01T00:00:00Z","modifiedAt":"0001-01-01T00:00:00Z","deletedAt":{"Time":"0001-01-01T00:00:00Z","Valid":false},"name":"test","website":"test","country":"test","source":"test","notes":"test","comments":"test","categories":"test","contactsCount":1,"articlesCount":1,"projectsCount":1},{"id":5,"createdAt":"0001-01-01T00:00:00Z","modifiedAt":"0001-01-01T00:00:00Z","deletedAt":{"Time":"0001-01-01T00:00:00Z","Valid":false},"name":"test","website":"test","country":"test","source":"test","notes":"test","comments":"test","categories":"test","contactsCount":1,"articlesCount":1,"projectsCount":1},{"id":6,"createdAt":"0001-01-01T00:00:00Z","modifiedAt":"0001-01-01T00:00:00Z","deletedAt":{"Time":"0001-01-01T00:00:00Z","Valid":false},"name":"test","website":"test","country":"test","source":"test","notes":"test","comments":"test","categories":"test","contactsCount":1,"articlesCount":1,"projectsCount":1}]`,
+			`[{"id":3,"createdAt":"0001-01-01T00:00:00Z","modifiedAt":"0001-01-01T00:00:00Z","deletedAt":{"Time":"0001-01-01T00:00:00Z","Valid":false},"name":"test","website":"test","country":"test","source":"test","notes":"test","privacy":"test","comment":"test","categories":"test","contactsCount":1,"articlesCount":1,"projectsCount":1},{"id":4,"createdAt":"0001-01-01T00:00:00Z","modifiedAt":"0001-01-01T00:00:00Z","deletedAt":{"Time":"0001-01-01T00:00:00Z","Valid":false},"name":"test","website":"test","country":"test","source":"test","notes":"test","privacy":"test","comment":"test","categories":"test","contactsCount":1,"articlesCount":1,"projectsCount":1},{"id":5,"createdAt":"0001-01-01T00:00:00Z","modifiedAt":"0001-01-01T00:00:00Z","deletedAt":{"Time":"0001-01-01T00:00:00Z","Valid":false},"name":"test","website":"test","country":"test","source":"test","notes":"test","privacy":"test","comment":"test","categories":"test","contactsCount":1,"articlesCount":1,"projectsCount":1},{"id":6,"createdAt":"0001-01-01T00:00:00Z","modifiedAt":"0001-01-01T00:00:00Z","deletedAt":{"Time":"0001-01-01T00:00:00Z","Valid":false},"name":"test","website":"test","country":"test","source":"test","notes":"test","privacy":"test","comment":"test","categories":"test","contactsCount":1,"articlesCount":1,"projectsCount":1}]`,
 		},
 	}
 
