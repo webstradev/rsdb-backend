@@ -14,7 +14,7 @@ type Platform struct {
 	ProjectsCount int    `json:"projectsCount" db:"projects_count"`
 }
 
-func (db *Database) GetAllPlatforms() ([]Platform, error) {
+func (db *Database) GetPlatforms(page, pageSize int) ([]Platform, error) {
 	platforms := []Platform{}
 
 	err := db.querier.Select(&platforms, `
@@ -37,7 +37,8 @@ func (db *Database) GetAllPlatforms() ([]Platform, error) {
 	LEFT JOIN
 		categories ca ON ca.id = pc.category_id
 	WHERE p.deleted_at IS NULL
-	GROUP BY p.id`)
+	GROUP BY p.id
+	LIMIT ? OFFSET ?`, pageSize, (page-1)*pageSize)
 	if err != nil {
 		return nil, err
 	}
