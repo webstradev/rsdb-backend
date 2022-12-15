@@ -60,8 +60,12 @@ func main() {
 
 	router.POST("/api/login", controllers.Login(env))
 
+	// All the calls to the api group will require authentication
 	api := router.Group("/api")
 	api.Use(middlewares.JWTAuthMiddleware(env))
+
+	api.GET("/counts", controllers.GetCounts(env))
+	api.GET("/platforms", middlewares.PaginationMiddleware(), controllers.GetPlatforms(env))
 
 	// Server object
 	s := &http.Server{
