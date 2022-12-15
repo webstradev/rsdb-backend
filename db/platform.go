@@ -7,11 +7,12 @@ type Platform struct {
 	Country       string `json:"country" db:"country"`
 	Source        string `json:"source" db:"source"`
 	Notes         string `json:"notes" db:"notes"`
-	Comments      string `json:"comments" db:"comments"`
+	Comment       string `json:"comment" db:"comment"`
 	Categories    string `json:"categories" db:"platform_categories"`
 	ContactsCount int    `json:"contactsCount" db:"contacts_count"`
 	ArticlesCount int    `json:"articlesCount" db:"articles_count"`
 	ProjectsCount int    `json:"projectsCount" db:"projects_count"`
+	Privacy       string `json:"privacy" db:"privacy"`
 }
 
 func (db *Database) GetPlatforms(page, pageSize int) ([]Platform, error) {
