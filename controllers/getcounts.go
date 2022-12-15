@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"log"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/webstradev/rsdb-backend/utils"
@@ -25,14 +25,13 @@ func GetCounts(env *utils.Environment) gin.HandlerFunc {
 			// Fetch count from database
 			count, err := env.DB.CountRowsForTable(table)
 			if err != nil {
-				log.Println(err)
-				c.AbortWithStatus(500)
+				c.AbortWithStatus(http.StatusInternalServerError)
 				return
 			}
 
 			counts[table] = count
 		}
 
-		c.JSON(200, counts)
+		c.JSON(http.StatusOK, counts)
 	}
 }
