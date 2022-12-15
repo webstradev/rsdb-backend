@@ -5,7 +5,6 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
-	"strings"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
@@ -18,7 +17,6 @@ func TestGetCounts(t *testing.T) {
 		Name       string
 		MockDbCall func(sqlmock.Sqlmock)
 		StatusCode int
-		Body       string
 		Response   string
 	}{
 		{
@@ -27,7 +25,6 @@ func TestGetCounts(t *testing.T) {
 				mock.ExpectQuery("SELECT COUNT(.+) as count FROM").WithArgs("platforms").WillReturnError(errors.New("test"))
 			},
 			http.StatusInternalServerError,
-			`{}`,
 			`{}`,
 		},
 		{
@@ -46,7 +43,6 @@ func TestGetCounts(t *testing.T) {
 				mock.ExpectQuery("SELECT COUNT(.+) AS count FROM").WithArgs("projects").WillReturnRows(rows)
 			},
 			http.StatusOK,
-			`{}`,
 			`{"platforms":100,"contacts":50,"articles":200,"projects":150}`,
 		},
 	}
@@ -65,7 +61,7 @@ func TestGetCounts(t *testing.T) {
 			r.GET("/api/counts", GetCounts(env))
 
 			// Create httptest request
-			req, _ := http.NewRequest("GET", "/api/counts", strings.NewReader(test.Body))
+			req, _ := http.NewRequest("GET", "/api/counts", nil)
 			w := httptest.NewRecorder()
 
 			// Mock request
