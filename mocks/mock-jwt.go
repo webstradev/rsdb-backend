@@ -37,7 +37,7 @@ func (j *MockJWTService) ValidateJWTToken(signedString string) (*auth.TokenData,
 	}
 
 	if signedString == "usertoken" {
-		return &auth.TokenData{UserID: 1, Role: "user"}, nil
+		return &auth.TokenData{UserID: 2, Role: "user"}, nil
 	}
 
 	return nil, jwt.NewValidationError("Invalid JWT token", 0)
