@@ -35,6 +35,24 @@ func TestPaginationMiddleware(t *testing.T) {
 			0,
 		},
 		{
+			"PageSize below min - Bad Request",
+			url.Values{
+				"page":     {"1"},
+				"pageSize": {"0"},
+			},
+			0,
+			0,
+		},
+		{
+			"PageSize above max - Bad Request",
+			url.Values{
+				"page":     {"1"},
+				"pageSize": {"101"},
+			},
+			0,
+			0,
+		},
+		{
 			"Default Handling",
 			url.Values{},
 			1,
