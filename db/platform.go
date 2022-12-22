@@ -46,3 +46,34 @@ func (db *Database) GetPlatforms(page, pageSize int) ([]Platform, error) {
 
 	return platforms, nil
 }
+
+func (db *Database) GetPlatform(id int64) (*Platform, error) {
+	platform := Platform{}
+
+	err := db.querier.Get(&platform, `
+	SELECT 
+		p.* , 
+		COUNT(DISTINCT c.id) as contacts_count,
+		COUNT(DISTINCT pa.article_id) as articles_count,
+		COUNT(DISTINCT pp.project_id) as projects_count,
+		GROUP_CONCAT(DISTINCT ca.category) AS platform_categories
+	FROM 
+		platforms p 
+	LEFT JOIN 
+		contacts c ON c.platform_id = p.id 
+	LEFT JOIN 
+		platforms_articles pa ON pa.platform_id = p.id
+	LEFT JOIN 
+		platforms_projects pp ON pp.platform_id = p.id
+	LEFT JOIN 
+		platforms_categories pc ON pc.platform_id = p.id
+	LEFT JOIN
+		categories ca ON ca.id = pc.category_id
+	WHERE p.deleted_at IS NULL AND p.id = ?
+	GROUP BY p.id`, id)
+	if err != nil {
+		return nil, err
+	}
+
+	return &platform, nil
+}

@@ -19,6 +19,7 @@ func GetPlatforms(env *utils.Environment) gin.HandlerFunc {
 			c.AbortWithStatus(http.StatusInternalServerError)
 			return
 		}
+
 		c.JSON(http.StatusOK, platforms)
 	}
 }

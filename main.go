@@ -66,6 +66,7 @@ func main() {
 
 	api.GET("/counts", controllers.GetCounts(env))
 	api.GET("/platforms", middlewares.PaginationMiddleware(), controllers.GetPlatforms(env))
+	api.GET("/platforms/:id", controllers.GetPlatform(env))
 
 	// Server object
 	s := &http.Server{
