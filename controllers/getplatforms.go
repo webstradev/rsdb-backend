@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -15,7 +14,6 @@ func GetPlatforms(env *utils.Environment) gin.HandlerFunc {
 
 		platforms, err := env.DB.GetPlatforms(page, pageSize)
 		if err != nil {
-			log.Println(err)
 			c.AbortWithStatus(http.StatusInternalServerError)
 			return
 		}
