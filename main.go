@@ -70,7 +70,7 @@ func main() {
 
 	// Server object
 	s := &http.Server{
-		Addr:         "127.0.0.1:8080",
+		Addr:         ":8080",
 		Handler:      router,
 		IdleTimeout:  120 * time.Second,
 		ReadTimeout:  2 * time.Second,
