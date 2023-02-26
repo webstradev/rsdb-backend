@@ -1,0 +1,6 @@
+auth:
+  username: webstra
+  existingSecret: mysql-secrets
+
+metrics: 
+  enabled: true
