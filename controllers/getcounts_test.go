@@ -22,7 +22,7 @@ func TestGetCounts(t *testing.T) {
 		{
 			"GetCounts - sql error - CountRowsForTable",
 			func(mock sqlmock.Sqlmock) {
-				mock.ExpectQuery("SELECT COUNT(.+) as count FROM").WithArgs("platforms").WillReturnError(errors.New("test"))
+				mock.ExpectQuery("SELECT COUNT(.+) as count FROM platforms").WillReturnError(errors.New("test"))
 			},
 			http.StatusInternalServerError,
 			`{}`,
@@ -31,19 +31,19 @@ func TestGetCounts(t *testing.T) {
 			"GetCounts - successfull",
 			func(mock sqlmock.Sqlmock) {
 				rows := sqlmock.NewRows([]string{"count"}).AddRow(100)
-				mock.ExpectQuery("SELECT COUNT(.+) AS count FROM").WithArgs("platforms").WillReturnRows(rows)
+				mock.ExpectQuery("SELECT COUNT(.+) AS count FROM platforms ").WillReturnRows(rows)
 
 				rows = sqlmock.NewRows([]string{"count"}).AddRow(50)
-				mock.ExpectQuery("SELECT COUNT(.+) AS count FROM").WithArgs("contacts").WillReturnRows(rows)
+				mock.ExpectQuery("SELECT COUNT(.+) AS count FROM articles").WillReturnRows(rows)
 
 				rows = sqlmock.NewRows([]string{"count"}).AddRow(200)
-				mock.ExpectQuery("SELECT COUNT(.+) AS count FROM").WithArgs("articles").WillReturnRows(rows)
+				mock.ExpectQuery("SELECT COUNT(.+) AS count FROM projects").WillReturnRows(rows)
 
 				rows = sqlmock.NewRows([]string{"count"}).AddRow(150)
-				mock.ExpectQuery("SELECT COUNT(.+) AS count FROM").WithArgs("projects").WillReturnRows(rows)
+				mock.ExpectQuery("SELECT COUNT(.+) AS count FROM contacts").WillReturnRows(rows)
 			},
 			http.StatusOK,
-			`{"platforms":100,"contacts":50,"articles":200,"projects":150}`,
+			`{"platforms":100,"contacts":150,"articles":50,"projects":200}`,
 		},
 	}
 

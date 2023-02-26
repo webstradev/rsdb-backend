@@ -77,3 +77,9 @@ func (db *Database) GetPlatform(id int64) (*Platform, error) {
 
 	return &platform, nil
 }
+
+func (db *Database) CountPlatforms() (int, error) {
+	var count int
+	err := db.querier.Get(&count, "SELECT COUNT(*) AS count FROM platforms WHERE deleted_at IS NULL")
+	return count, err
+}

@@ -12,3 +12,9 @@ type Contact struct {
 	Source  string `json:"source" db:"source"`
 	Privacy string `json:"privacy" db:"privacy"`
 }
+
+func (db *Database) CountContacts() (int, error) {
+	var count int
+	err := db.querier.Get(&count, "SELECT COUNT(*) AS count FROM contacts WHERE deleted_at IS NULL")
+	return count, err
+}

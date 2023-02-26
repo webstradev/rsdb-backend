@@ -7,30 +7,48 @@ import (
 	"github.com/webstradev/rsdb-backend/utils"
 )
 
-type Count struct {
-	Name  string `json:"name"`
-	Count int    `json:"count"`
+type Counts struct {
+	Platforms int `json:"platforms"`
+	Articles  int `json:"articles"`
+	Projects  int `json:"projects"`
+	Contacts  int `json:"contacts"`
 }
-
-type Counts map[string]int
-
-var tablesToCount = []string{"platforms", "contacts", "articles", "projects"}
 
 func GetCounts(env *utils.Environment) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		counts := Counts{}
 
-		// Get counts for each table
-		for _, table := range tablesToCount {
-			// Fetch count from database
-			count, err := env.DB.CountRowsForTable(table)
-			if err != nil {
-				c.AbortWithStatus(http.StatusInternalServerError)
-				return
-			}
-
-			counts[table] = count
+		// Fetch count from database
+		count, err := env.DB.CountPlatforms()
+		if err != nil {
+			c.AbortWithStatus(http.StatusInternalServerError)
+			return
 		}
+		counts.Platforms = count
+
+		// Fetch count from database
+		count, err = env.DB.CountArticles()
+		if err != nil {
+			c.AbortWithStatus(http.StatusInternalServerError)
+			return
+		}
+		counts.Articles = count
+
+		// Fetch count from database
+		count, err = env.DB.CountProjects()
+		if err != nil {
+			c.AbortWithStatus(http.StatusInternalServerError)
+			return
+		}
+		counts.Projects = count
+
+		// Fetch count from database
+		count, err = env.DB.CountContacts()
+		if err != nil {
+			c.AbortWithStatus(http.StatusInternalServerError)
+			return
+		}
+		counts.Contacts = count
 
 		c.JSON(http.StatusOK, counts)
 	}
