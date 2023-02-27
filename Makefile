@@ -15,14 +15,23 @@ run: build
 	@echo "Running binary..."
 	@./bin/$(BINARY_NAME)
 
-# Temporary deployment script that will be replaced by a CI/CD pipeline
-deploy:
+# Temporary deployment scripts that will be replaced by a CI/CD pipeline
+build_docker:
 	@echo "Building docker image..."
 	@docker build -t webstradev/rsdb-backend:latest .
 	@echo "Pushing docker image..."
 	@docker push webstradev/rsdb-backend:latest
-	@echo "Deleting old k8s deployment"
-	@kubectl delete deployment rsdb-backend
-	@echo "Deploying new k8s deployment"
+
+deploy-prod:
+	@echo "Deleting old k8s production deployment"
+	-@kubectl delete deployment rsdb-backend
+	@echo "Deploying new k8s production deployment"
 	@kubectl apply -f kube/deployment.yaml
+	@echo "Done!"
+
+deploy:
+	@echo "Deleting old k8s deployment"
+	-@kubectl delete deployment rsdb-dev-backend
+	@echo "Deploying new k8s deployment"
+	@kubectl apply -f kube/dev-deployment.yaml
 	@echo "Done!"
