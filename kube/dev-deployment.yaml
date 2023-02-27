@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rsdb-dev-backend
+  namespace: rsdb
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: rsdb-dev-backend
+  template:
+    metadata:
+      labels:
+        app: rsdb-dev-backend
+    spec:
+      containers:
+      - name: rsdb-dev-backend-container
+        image: webstradev/rsdb-backend:latest
+        envFrom:
+            - secretRef:
+                name: rsdb-dev-secrets
+        ports:
+        - containerPort: 8080
+        readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 3
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 3
+      imagePullSecrets:
+      - name: regcred

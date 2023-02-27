@@ -8,6 +8,19 @@ metadata:
 kind: Service
 apiVersion: v1
 metadata:
+  name: rsdb-dev-backend-service 
+  namespace: rsdb
+spec:
+  selector:
+    app: rsdb-dev-backend
+  ports:
+  - protocol: TCP
+    port: 8080
+    targetPort: 8080
+---
+kind: Service
+apiVersion: v1
+metadata:
   name: rsdb-backend-service 
   namespace: rsdb
 spec:
@@ -31,8 +44,8 @@ spec:
   ingress:
   - from:
     - podSelector:
-        matchLabels:
-          app: rsdb-backend
+        matchExpressions:
+        - {key: app, operator: In, values: [rsdb-backend, rsdb-dev-backend]}
     ports:
     - port: 3306
       protocol: TCP
@@ -51,6 +64,9 @@ spec:
     - hosts:
       - rsdb.webstra.dev
       secretName: rsdb-tls
+    - hosts:
+      - dev.rsdb.webstra.dev
+      secretName: rsdb-dev-tls
   rules:
   - host: rsdb.webstra.dev
     http:
@@ -60,5 +76,15 @@ spec:
         backend:
           service:
             name: rsdb-backend-service
+            port:
+              number: 8080
+  - host: dev.rsdb.webstra.dev
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: rsdb-dev-backend-service
             port:
               number: 8080
