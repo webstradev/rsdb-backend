@@ -35,3 +35,7 @@ deploy:
 	@echo "Deploying new k8s deployment"
 	@kubectl apply -f kube/dev-deployment.yaml
 	@echo "Done!"
+
+
+dev: build_docker deploy
+	@echo "Done!"
