@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"log"
 	"net/http"
 	"strconv"
 
@@ -14,12 +15,21 @@ func GetPlatform(env *utils.Environment) gin.HandlerFunc {
 
 		id, err := strconv.ParseInt(idString, 10, 64)
 		if err != nil {
+			log.Println(err)
 			c.AbortWithStatus(http.StatusBadRequest)
 			return
 		}
 
 		platform, err := env.DB.GetPlatform(id)
 		if err != nil {
+			log.Println(err)
+			c.AbortWithStatus(http.StatusInternalServerError)
+			return
+		}
+
+		err = platform.PopulateCategories(env.DB)
+		if err != nil {
+			log.Println(err)
 			c.AbortWithStatus(http.StatusInternalServerError)
 			return
 		}

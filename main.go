@@ -70,9 +70,13 @@ func main() {
 	api := router.Group("/api/v1")
 	api.Use(middlewares.JWTAuthMiddleware(env))
 
+	// General
 	api.GET("/counts", controllers.GetCounts(env))
+
+	// Platforms
 	api.GET("/platforms", middlewares.PaginationMiddleware(), controllers.GetPlatforms(env))
 	api.GET("/platforms/:id", controllers.GetPlatform(env))
+	api.PUT("/platforms/:id", controllers.EditPlatforms(env))
 
 	// Server object
 	s := &http.Server{
