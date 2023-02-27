@@ -54,13 +54,13 @@ func main() {
 	router := gin.New()
 
 	// Disable logging for health check endpoint
-	logger := gin.LoggerWithConfig(gin.LoggerConfig{SkipPaths: []string{"/health"}})
+	logger := gin.LoggerWithConfig(gin.LoggerConfig{SkipPaths: []string{"/api/health"}})
 
 	// Use the logger and recovery middleware
 	router.Use(logger, gin.Recovery())
 
 	// Health check for k8s
-	router.GET("/health", func(c *gin.Context) {
+	router.GET("/api/health", func(c *gin.Context) {
 		c.Status(http.StatusOK)
 	})
 
