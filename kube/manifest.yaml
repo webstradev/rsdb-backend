@@ -19,6 +19,25 @@ spec:
     targetPort: 8080
 ---
 apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: mysql-network-policy
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: mysql
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: rsdb-backend
+    ports:
+    - port: 3306
+      protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: rsdb-ingress
