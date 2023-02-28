@@ -38,6 +38,19 @@ func TestGetPlatform(t *testing.T) {
 			`{}`,
 		},
 		{
+			"GetPlatform - sql error on GetPlatformCategories",
+			"1",
+			func(mock sqlmock.Sqlmock) {
+				rows := sqlmock.NewRows([]string{"id", "name", "website", "country", "source", "notes", "comment", "privacy", "contacts_count", "articles_count", "projects_count"}).
+					AddRow(1, "test", "test", "test", "test", "test", "test", "test", 1, 1, 1)
+				mock.ExpectQuery("SELECT p.(.+)").WithArgs(1).WillReturnRows(rows)
+
+				mock.ExpectQuery("SELECT pc.(.+)").WithArgs(1).WillReturnError(errors.New("test"))
+			},
+			http.StatusInternalServerError,
+			`{}`,
+		},
+		{
 			"GetPlatform - Valid Request",
 			"1",
 			func(mock sqlmock.Sqlmock) {
