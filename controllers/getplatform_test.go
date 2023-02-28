@@ -41,12 +41,16 @@ func TestGetPlatform(t *testing.T) {
 			"GetPlatform - Valid Request",
 			"1",
 			func(mock sqlmock.Sqlmock) {
-				rows := sqlmock.NewRows([]string{"id", "name", "website", "country", "source", "notes", "comment", "privacy", "contacts_count", "articles_count", "projects_count", "platform_categories"}).
-					AddRow(1, "test", "test", "test", "test", "test", "test", "test", 1, 1, 1, "test")
+				rows := sqlmock.NewRows([]string{"id", "name", "website", "country", "source", "notes", "comment", "privacy", "contacts_count", "articles_count", "projects_count"}).
+					AddRow(1, "test", "test", "test", "test", "test", "test", "test", 1, 1, 1)
 				mock.ExpectQuery("SELECT p.(.+)").WithArgs(1).WillReturnRows(rows)
+
+				rows = sqlmock.NewRows([]string{"platform_id", "category_id", "category"}).
+					AddRow(1, 1, "test")
+				mock.ExpectQuery("SELECT pc.(.+)").WithArgs(1).WillReturnRows(rows)
 			},
 			http.StatusOK,
-			`{"id":1,"createdAt":"0001-01-01T00:00:00Z","modifiedAt":"0001-01-01T00:00:00Z","deletedAt":{"Time":"0001-01-01T00:00:00Z","Valid":false},"name":"test","website":"test","country":"test","source":"test","notes":"test","privacy":"test","comment":"test","categories":"test","contactsCount":1,"articlesCount":1,"projectsCount":1}`,
+			`{"id":1,"createdAt":"0001-01-01T00:00:00Z","modifiedAt":"0001-01-01T00:00:00Z","deletedAt":{"Time":"0001-01-01T00:00:00Z","Valid":false},"name":"test","website":"test","country":"test","source":"test","notes":"test","privacy":"test","comment":"test","categories":[{"id":1, "category":"test"}],"contactsCount":1,"articlesCount":1,"projectsCount":1}`,
 		},
 	}
 
