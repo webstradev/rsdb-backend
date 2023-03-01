@@ -100,6 +100,21 @@ func (db *Database) CountPlatforms() (int, error) {
 	return count, err
 }
 
+func (db *Database) CreatePlatform(name, website, country, source, notes, comment, privacy string) (int64, error) {
+	// Create the platform
+	result, err := db.querier.Exec(`INSERT INTO platforms (name, website, country, source, notes, comment, privacy) VALUES (?, ?, ?, ?, ?, ?, ?)`, name, website, country, source, notes, comment, privacy)
+	if err != nil {
+		return -1, err
+	}
+
+	id, err := result.LastInsertId()
+	if err != nil {
+		return -1, err
+	}
+
+	return id, nil
+}
+
 func (db *Database) EditPlatform(name, website, country, source, notes, comment, privacy string, id int64) error {
 	// Update basic platform information
 	_, err := db.querier.Exec(`UPDATE platforms SET name = ?, website = ?, country = ?, source = ?, notes = ?, comment = ?, privacy = ? WHERE id = ?`, name, website, country, source, notes, comment, privacy, id)
@@ -109,13 +124,7 @@ func (db *Database) EditPlatform(name, website, country, source, notes, comment,
 	return nil
 }
 
-func (db *Database) UpdatePlatformCategories(platformId int64, categories []int64) error {
-	// Delete all existing categories for this platform
-	_, err := db.querier.Exec("DELETE FROM platforms_categories WHERE platform_id = ?", platformId)
-	if err != nil {
-		return err
-	}
-
+func (db *Database) InsertPlatformCategories(platformId int64, categories []int64) error {
 	// If there are no categories, we're done
 	if len(categories) == 0 {
 		return nil
@@ -136,7 +145,23 @@ func (db *Database) UpdatePlatformCategories(platformId int64, categories []int6
 	// Remove the last comma
 	query = strings.TrimRight(query, ",")
 
-	_, err = db.querier.Exec(query, args...)
+	_, err := db.querier.Exec(query, args...)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (db *Database) UpdatePlatformCategories(platformId int64, categories []int64) error {
+	// Delete all existing categories for this platform
+	_, err := db.querier.Exec("DELETE FROM platforms_categories WHERE platform_id = ?", platformId)
+	if err != nil {
+		return err
+	}
+
+	// Insert the new categories
+	err = db.InsertPlatformCategories(platformId, categories)
 	if err != nil {
 		return err
 	}

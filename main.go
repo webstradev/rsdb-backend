@@ -75,6 +75,7 @@ func main() {
 
 	// Platforms
 	api.GET("/platforms", middlewares.PaginationMiddleware(), controllers.GetPlatforms(env))
+	api.POST("/platforms", controllers.CreatePlatform(env))
 	api.GET("/platforms/:id", controllers.GetPlatform(env))
 	api.PUT("/platforms/:id", controllers.EditPlatform(env))
 
