@@ -20,22 +20,23 @@ type editPlatformInput struct {
 	Categories []int64 `json:"categories" binding:"required"`
 }
 
-func EditPlatforms(env *utils.Environment) gin.HandlerFunc {
+func EditPlatform(env *utils.Environment) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// Validate Input
-		input := editPlatformInput{}
-		err := c.ShouldBindJSON(&input)
-		if err != nil {
-			c.JSON(400, gin.H{"error": err.Error()})
-			return
-		}
-
 		// Get platform ID from URL
 		idString := c.Param("id")
 		id, err := strconv.ParseInt(idString, 10, 64)
 		if err != nil {
 			log.Println(err)
-			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err})
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
+			return
+		}
+
+		// Validate Input
+		input := editPlatformInput{}
+		err = c.ShouldBindJSON(&input)
+		if err != nil {
+			log.Println(err)
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 

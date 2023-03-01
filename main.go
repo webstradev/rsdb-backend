@@ -76,7 +76,7 @@ func main() {
 	// Platforms
 	api.GET("/platforms", middlewares.PaginationMiddleware(), controllers.GetPlatforms(env))
 	api.GET("/platforms/:id", controllers.GetPlatform(env))
-	api.PUT("/platforms/:id", controllers.EditPlatforms(env))
+	api.PUT("/platforms/:id", controllers.EditPlatform(env))
 
 	// Server object
 	s := &http.Server{

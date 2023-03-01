@@ -70,7 +70,7 @@ func TestGetPlatform(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
 			// Initilize test router, environemnt and mock database
-			r, mockDb, env, err := utils.SetupTestEnvironment(test.MockDbCall)
+			r, mockDb, mockSql, env, err := utils.SetupTestEnvironment(test.MockDbCall)
 			// Close the mock database at the end of the test
 			defer mockDb.Close()
 
@@ -101,6 +101,12 @@ func TestGetPlatform(t *testing.T) {
 
 			// Check response body
 			require.JSONEq(t, test.Response, response)
+
+			// Check for any remaining expectations
+			// we make sure that all expectations were met
+			if err := mockSql.ExpectationsWereMet(); err != nil {
+				t.Fatalf("there were unfulfilled expectations: %s", err)
+			}
 		})
 	}
 }

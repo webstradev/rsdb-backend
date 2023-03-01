@@ -16,7 +16,7 @@ type Environment struct {
 	JWT auth.JWTServicer
 }
 
-func SetupTestEnvironment(MockDbCall func(sqlmock.Sqlmock)) (*gin.Engine, *sql.DB, *Environment, error) {
+func SetupTestEnvironment(MockDbCall func(sqlmock.Sqlmock)) (*gin.Engine, *sql.DB, sqlmock.Sqlmock, *Environment, error) {
 	// Setup environment
 	r := gin.Default()
 	gin.SetMode(gin.TestMode)
@@ -24,7 +24,7 @@ func SetupTestEnvironment(MockDbCall func(sqlmock.Sqlmock)) (*gin.Engine, *sql.D
 	// Create mock database
 	mockDb, mockSql, err := sqlmock.New()
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, nil, nil, err
 	}
 
 	// Create sqlx instance which an be passed to functions
@@ -39,5 +39,5 @@ func SetupTestEnvironment(MockDbCall func(sqlmock.Sqlmock)) (*gin.Engine, *sql.D
 	// Create mock JWT service
 	env.JWT = mocks.CreateMockJWTService()
 
-	return r, mockDb, &env, nil
+	return r, mockDb, mockSql, &env, nil
 }

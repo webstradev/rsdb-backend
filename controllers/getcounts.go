@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -21,6 +22,7 @@ func GetCounts(env *utils.Environment) gin.HandlerFunc {
 		// Fetch count from database
 		count, err := env.DB.CountPlatforms()
 		if err != nil {
+			log.Println(err)
 			c.AbortWithStatus(http.StatusInternalServerError)
 			return
 		}
@@ -29,6 +31,7 @@ func GetCounts(env *utils.Environment) gin.HandlerFunc {
 		// Fetch count from database
 		count, err = env.DB.CountArticles()
 		if err != nil {
+			log.Println(err)
 			c.AbortWithStatus(http.StatusInternalServerError)
 			return
 		}
@@ -37,6 +40,7 @@ func GetCounts(env *utils.Environment) gin.HandlerFunc {
 		// Fetch count from database
 		count, err = env.DB.CountProjects()
 		if err != nil {
+			log.Println(err)
 			c.AbortWithStatus(http.StatusInternalServerError)
 			return
 		}
@@ -45,6 +49,7 @@ func GetCounts(env *utils.Environment) gin.HandlerFunc {
 		// Fetch count from database
 		count, err = env.DB.CountContacts()
 		if err != nil {
+			log.Println(err)
 			c.AbortWithStatus(http.StatusInternalServerError)
 			return
 		}

@@ -22,7 +22,7 @@ func TestGetCounts(t *testing.T) {
 		{
 			"GetCounts - sql error - CountPlatforms",
 			func(mock sqlmock.Sqlmock) {
-				mock.ExpectQuery("SELECT COUNT(.+) as count FROM platforms").WillReturnError(errors.New("test"))
+				mock.ExpectQuery("SELECT COUNT(.+) AS count FROM platforms").WillReturnError(errors.New("test"))
 			},
 			http.StatusInternalServerError,
 			`{}`,
@@ -31,9 +31,9 @@ func TestGetCounts(t *testing.T) {
 			"GetCounts - sql error - CountArticles",
 			func(mock sqlmock.Sqlmock) {
 				rows := sqlmock.NewRows([]string{"count"}).AddRow(100)
-				mock.ExpectQuery("SELECT COUNT(.+) AS count FROM platforms ").WillReturnRows(rows)
+				mock.ExpectQuery("SELECT COUNT(.+) AS count FROM platforms WHERE deleted_at IS NULL").WillReturnRows(rows)
 
-				mock.ExpectQuery("SELECT COUNT(.+) as count FROM articles").WillReturnError(errors.New("test"))
+				mock.ExpectQuery("SELECT COUNT(.+) AS count FROM articles WHERE deleted_at IS NULL").WillReturnError(errors.New("test"))
 			},
 			http.StatusInternalServerError,
 			`{}`,
@@ -42,12 +42,12 @@ func TestGetCounts(t *testing.T) {
 			"GetCounts - sql error - CountProjects",
 			func(mock sqlmock.Sqlmock) {
 				rows := sqlmock.NewRows([]string{"count"}).AddRow(100)
-				mock.ExpectQuery("SELECT COUNT(.+) AS count FROM platforms ").WillReturnRows(rows)
+				mock.ExpectQuery("SELECT COUNT(.+) AS count FROM platforms WHERE deleted_at IS NULL").WillReturnRows(rows)
 
 				rows = sqlmock.NewRows([]string{"count"}).AddRow(50)
-				mock.ExpectQuery("SELECT COUNT(.+) AS count FROM articles").WillReturnRows(rows)
+				mock.ExpectQuery("SELECT COUNT(.+) AS count FROM articles WHERE deleted_at IS NULL").WillReturnRows(rows)
 
-				mock.ExpectQuery("SELECT COUNT(.+) as count FROM projects").WillReturnError(errors.New("test"))
+				mock.ExpectQuery("SELECT COUNT(.+) AS count FROM projects WHERE deleted_at IS NULL").WillReturnError(errors.New("test"))
 			},
 			http.StatusInternalServerError,
 			`{}`,
@@ -56,15 +56,15 @@ func TestGetCounts(t *testing.T) {
 			"GetCounts - sql error - CountContacts",
 			func(mock sqlmock.Sqlmock) {
 				rows := sqlmock.NewRows([]string{"count"}).AddRow(100)
-				mock.ExpectQuery("SELECT COUNT(.+) AS count FROM platforms ").WillReturnRows(rows)
+				mock.ExpectQuery("SELECT COUNT(.+) AS count FROM platforms WHERE deleted_at IS NULL").WillReturnRows(rows)
 
 				rows = sqlmock.NewRows([]string{"count"}).AddRow(50)
-				mock.ExpectQuery("SELECT COUNT(.+) AS count FROM articles").WillReturnRows(rows)
+				mock.ExpectQuery("SELECT COUNT(.+) AS count FROM articles WHERE deleted_at IS NULL").WillReturnRows(rows)
 
 				rows = sqlmock.NewRows([]string{"count"}).AddRow(200)
-				mock.ExpectQuery("SELECT COUNT(.+) AS count FROM projects").WillReturnRows(rows)
+				mock.ExpectQuery("SELECT COUNT(.+) AS count FROM projects WHERE deleted_at IS NULL").WillReturnRows(rows)
 
-				mock.ExpectQuery("SELECT COUNT(.+) as count FROM contacts").WillReturnError(errors.New("test"))
+				mock.ExpectQuery("SELECT COUNT(.+) AS count FROM contacts WHERE deleted_at IS NULL").WillReturnError(errors.New("test"))
 			},
 			http.StatusInternalServerError,
 			`{}`,
@@ -73,7 +73,7 @@ func TestGetCounts(t *testing.T) {
 			"GetCounts - successfull",
 			func(mock sqlmock.Sqlmock) {
 				rows := sqlmock.NewRows([]string{"count"}).AddRow(100)
-				mock.ExpectQuery("SELECT COUNT(.+) AS count FROM platforms ").WillReturnRows(rows)
+				mock.ExpectQuery("SELECT COUNT(.+) AS count FROM platforms").WillReturnRows(rows)
 
 				rows = sqlmock.NewRows([]string{"count"}).AddRow(50)
 				mock.ExpectQuery("SELECT COUNT(.+) AS count FROM articles").WillReturnRows(rows)
@@ -82,7 +82,7 @@ func TestGetCounts(t *testing.T) {
 				mock.ExpectQuery("SELECT COUNT(.+) AS count FROM projects").WillReturnRows(rows)
 
 				rows = sqlmock.NewRows([]string{"count"}).AddRow(150)
-				mock.ExpectQuery("SELECT COUNT(.+) AS count FROM contacts").WillReturnRows(rows)
+				mock.ExpectQuery("SELECT COUNT(.+) AS count FROM contacts WHERE deleted_at IS NULL").WillReturnRows(rows)
 			},
 			http.StatusOK,
 			`{"platforms":100,"contacts":150,"articles":50,"projects":200}`,
@@ -92,7 +92,7 @@ func TestGetCounts(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
 			// Initilize test router, environemnt and mock database
-			r, mockDb, env, err := utils.SetupTestEnvironment(test.MockDbCall)
+			r, mockDb, mockSql, env, err := utils.SetupTestEnvironment(test.MockDbCall)
 			// Close the mock database at the end of the test
 			defer mockDb.Close()
 
@@ -100,10 +100,10 @@ func TestGetCounts(t *testing.T) {
 			require.NoError(t, err)
 
 			// Register handler
-			r.GET("/api/counts", GetCounts(env))
+			r.GET("/api/v1/counts", GetCounts(env))
 
 			// Create httptest request
-			req, _ := http.NewRequest("GET", "/api/counts", nil)
+			req, _ := http.NewRequest("GET", "/api/v1/counts", nil)
 			w := httptest.NewRecorder()
 
 			// Mock request
@@ -123,6 +123,12 @@ func TestGetCounts(t *testing.T) {
 
 			// Check response body
 			require.JSONEq(t, test.Response, response)
+
+			// // Check for any remaining expectations
+			// // we make sure that all expectations were met
+			if err := mockSql.ExpectationsWereMet(); err != nil {
+				t.Fatalf("there were unfulfilled expectations: %s", err)
+			}
 		})
 	}
 
