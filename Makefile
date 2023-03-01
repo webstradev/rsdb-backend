@@ -39,3 +39,6 @@ deploy:
 
 dev: build_docker deploy
 	@echo "Done!"
+
+prod: build_docker deploy-prod
+	@echo "Done!"
