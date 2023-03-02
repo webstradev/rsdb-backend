@@ -24,14 +24,14 @@ build_docker:
 
 deploy-prod:
 	@echo "Deleting old k8s production deployment"
-	-@kubectl delete deployment rsdb-backend
+	-@kubectl delete deployment rsdb-backend -n rsdb
 	@echo "Deploying new k8s production deployment"
 	@kubectl apply -f kube/deployment.yaml
 	@echo "Done!"
 
 deploy:
 	@echo "Deleting old k8s deployment"
-	-@kubectl delete deployment rsdb-dev-backend
+	-@kubectl delete deployment rsdb-dev-backend -n rsdb
 	@echo "Deploying new k8s deployment"
 	@kubectl apply -f kube/dev-deployment.yaml
 	@echo "Done!"
