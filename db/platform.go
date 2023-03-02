@@ -168,3 +168,12 @@ func (db *Database) UpdatePlatformCategories(platformId int64, categories []int6
 
 	return nil
 }
+
+func (db *Database) DeletePlatform(platformId int64) error {
+	_, err := db.querier.Exec("UPDATE platforms SET deleted_at = CURRENT_TIMESTAMP() WHERE id = ?", platformId)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

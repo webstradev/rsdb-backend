@@ -78,6 +78,7 @@ func main() {
 	api.POST("/platforms", controllers.CreatePlatform(env))
 	api.GET("/platforms/:id", controllers.GetPlatform(env))
 	api.PUT("/platforms/:id", controllers.EditPlatform(env))
+	api.DELETE("/platforms/:id", controllers.DeletePlatform(env))
 
 	// Server object
 	s := &http.Server{
