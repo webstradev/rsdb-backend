@@ -80,6 +80,9 @@ func main() {
 	api.PUT("/platforms/:id", controllers.EditPlatform(env))
 	api.DELETE("/platforms/:id", controllers.DeletePlatform(env))
 
+	// Contacts
+	api.GET("/platforms/:id/contacts", controllers.GetContacts(env))
+
 	// Server object
 	s := &http.Server{
 		Addr:         ":8080",
