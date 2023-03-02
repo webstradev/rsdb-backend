@@ -25,3 +25,20 @@ func (db *Database) GetContactsForPlatform(platformId int64) ([]Contact, error) 
 	err := db.querier.Select(&contacts, "SELECT * FROM contacts WHERE platform_id = ? AND deleted_at IS NULL", platformId)
 	return contacts, err
 }
+
+func (db *Database) EditContact(contact Contact) error {
+	_, err := db.querier.NamedExec(`
+		UPDATE contacts 
+		SET 
+			name = :name, 
+			title = :title, 
+			email = :email, 
+			phone = :phone, 
+			phone2 = :phone2, 
+			address = :address, 
+			notes = :notes, 
+			source = :source, 
+			privacy = :privacy 
+		WHERE id = :id`, contact)
+	return err
+}

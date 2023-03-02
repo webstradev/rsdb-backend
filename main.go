@@ -82,6 +82,7 @@ func main() {
 
 	// Contacts
 	api.GET("/platforms/:id/contacts", controllers.GetContacts(env))
+	api.PUT("/contacts/:id", controllers.EditContact(env))
 
 	// Server object
 	s := &http.Server{
