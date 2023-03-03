@@ -2,7 +2,7 @@ package db
 
 type Contact struct {
 	Model
-	Name       string `json:"name" db:"name"`
+	Name       string `json:"name" db:"name" binding:"required"`
 	Title      string `json:"title" db:"title"`
 	Email      string `json:"email" db:"email"`
 	Phone      string `json:"phone" db:"phone"`
@@ -40,5 +40,14 @@ func (db *Database) EditContact(contact Contact) error {
 			source = :source, 
 			privacy = :privacy 
 		WHERE id = :id`, contact)
+	return err
+}
+
+func (db *Database) InsertContact(contact Contact) error {
+	_, err := db.querier.NamedExec(`
+		INSERT INTO contacts 
+			(name, title, email, phone, phone2, address, notes, source, privacy, platform_id) 
+		VALUES 
+			(:name, :title, :email, :phone, :phone2, :address, :notes, :source, :privacy, :platform_id)`, contact)
 	return err
 }
