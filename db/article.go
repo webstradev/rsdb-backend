@@ -8,12 +8,13 @@ import (
 
 type Article struct {
 	Model
-	Title       string    `json:"title" db:"title"`
-	Description string    `json:"description" db:"description"`
-	Link        string    `json:"link" db:"link"`
-	Date        time.Time `json:"date" db:"date"`
-	Body        string    `json:"body" db:"body"`
-	Tags        []Tag     `json:"tags" db:"tags"`
+	Title       string            `json:"title" db:"title"`
+	Description string            `json:"description" db:"description"`
+	Link        string            `json:"link" db:"link"`
+	Date        time.Time         `json:"date" db:"date"`
+	Body        string            `json:"body" db:"body"`
+	Tags        []ArticleTag      `json:"tags"`
+	Platforms   []ArticlePlatform `json:"platforms"`
 }
 
 type ArticleWithTagString struct {
@@ -25,6 +26,36 @@ func (db *Database) CountArticles() (int, error) {
 	var count int
 	err := db.querier.Get(&count, "SELECT COUNT(*) AS count FROM articles WHERE deleted_at IS NULL")
 	return count, err
+}
+
+func (a *Article) PopulateTags(db *Database) error {
+	tags, err := db.GetArticleTags(a.ID)
+	if err != nil {
+		return err
+	}
+
+	a.Tags = tags
+
+	return nil
+}
+
+func (a *Article) PopulatePlatforms(db *Database) error {
+	platforms, err := db.GetPlatformsForArticle(a.ID)
+	if err != nil {
+		return err
+	}
+
+	a.Platforms = platforms
+
+	return nil
+}
+
+func (db *Database) GetArticle(id int64) (Article, error) {
+	article := Article{}
+
+	err := db.querier.Get(&article, "SELECT a.* FROM articles a WHERE a.id = ? AND a.deleted_at IS NULL", id)
+
+	return article, err
 }
 
 func (db *Database) GetArticles(page, pageSize int) ([]ArticleWithTagString, error) {

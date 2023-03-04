@@ -16,8 +16,7 @@ import (
 )
 
 func TestGetArticles(t *testing.T) {
-
-	// Ttis timestamp is to mock date values returned by the database
+	// This timestamp is to mock date values returned by the database
 	timestamp, err := time.Parse("2006-01-02 15:04:05", "2023-01-01 00:00:00")
 	if err != nil {
 		t.Fatal(err)
@@ -52,7 +51,7 @@ func TestGetArticles(t *testing.T) {
 				mock.ExpectQuery("SELECT a.(.+) FROM articles").WithArgs(2, 0).WillReturnRows(rows)
 			},
 			http.StatusOK,
-			`[{"id":1,"createdAt":"0001-01-01T00:00:00Z","modifiedAt":"0001-01-01T00:00:00Z","deletedAt":{"Time":"0001-01-01T00:00:00Z","Valid":false},"title":"test","description":"test","link":"test","date":"2023-01-01T00:00:00Z","body":"test","tags":null,"tagString":""},{"id":2,"createdAt":"0001-01-01T00:00:00Z","modifiedAt":"0001-01-01T00:00:00Z","deletedAt":{"Time":"0001-01-01T00:00:00Z","Valid":false},"title":"test","description":"test","link":"test","date":"2023-01-01T00:00:00Z","body":"test","tags":null,"tagString":""}]`,
+			`[{"id":1,"createdAt":"0001-01-01T00:00:00Z","modifiedAt":"0001-01-01T00:00:00Z","deletedAt":{"Time":"0001-01-01T00:00:00Z","Valid":false},"title":"test","description":"test","link":"test","date":"2023-01-01T00:00:00Z","body":"test","platforms":null,"tags":null,"tagString":""},{"id":2,"createdAt":"0001-01-01T00:00:00Z","modifiedAt":"0001-01-01T00:00:00Z","deletedAt":{"Time":"0001-01-01T00:00:00Z","Valid":false},"title":"test","description":"test","link":"test","date":"2023-01-01T00:00:00Z","body":"test","platforms":null,"tags":null,"tagString":""}]`,
 		},
 		{
 			"GetArticles - 4 articles from page 2",
@@ -67,7 +66,7 @@ func TestGetArticles(t *testing.T) {
 				mock.ExpectQuery("SELECT a.(.+) FROM articles").WithArgs(4, 4).WillReturnRows(rows)
 			},
 			http.StatusOK,
-			`[{"id":3,"createdAt":"0001-01-01T00:00:00Z","modifiedAt":"0001-01-01T00:00:00Z","deletedAt":{"Time":"0001-01-01T00:00:00Z","Valid":false},"title":"test","description":"test","link":"test","date":"2023-01-01T00:00:00Z","body":"test","tags":null,"tagString":""},{"id":4,"createdAt":"0001-01-01T00:00:00Z","modifiedAt":"0001-01-01T00:00:00Z","deletedAt":{"Time":"0001-01-01T00:00:00Z","Valid":false},"title":"test","description":"test","link":"test","date":"2023-01-01T00:00:00Z","body":"test","tags":null,"tagString":""},{"id":5,"createdAt":"0001-01-01T00:00:00Z","modifiedAt":"0001-01-01T00:00:00Z","deletedAt":{"Time":"0001-01-01T00:00:00Z","Valid":false},"title":"test","description":"test","link":"test","date":"2023-01-01T00:00:00Z","body":"test","tags":null,"tagString":""},{"id":6,"createdAt":"0001-01-01T00:00:00Z","modifiedAt":"0001-01-01T00:00:00Z","deletedAt":{"Time":"0001-01-01T00:00:00Z","Valid":false},"title":"test","description":"test","link":"test","date":"2023-01-01T00:00:00Z","body":"test","tags":null,"tagString":""}]`,
+			`[{"id":3,"createdAt":"0001-01-01T00:00:00Z","modifiedAt":"0001-01-01T00:00:00Z","deletedAt":{"Time":"0001-01-01T00:00:00Z","Valid":false},"title":"test","description":"test","link":"test","date":"2023-01-01T00:00:00Z","body":"test","platforms":null,"tags":null,"tagString":""},{"id":4,"createdAt":"0001-01-01T00:00:00Z","modifiedAt":"0001-01-01T00:00:00Z","deletedAt":{"Time":"0001-01-01T00:00:00Z","Valid":false},"title":"test","description":"test","link":"test","date":"2023-01-01T00:00:00Z","body":"test","platforms":null,"tags":null,"tagString":""},{"id":5,"createdAt":"0001-01-01T00:00:00Z","modifiedAt":"0001-01-01T00:00:00Z","deletedAt":{"Time":"0001-01-01T00:00:00Z","Valid":false},"title":"test","description":"test","link":"test","date":"2023-01-01T00:00:00Z","body":"test","platforms":null,"tags":null,"tagString":""},{"id":6,"createdAt":"0001-01-01T00:00:00Z","modifiedAt":"0001-01-01T00:00:00Z","deletedAt":{"Time":"0001-01-01T00:00:00Z","Valid":false},"title":"test","description":"test","link":"test","date":"2023-01-01T00:00:00Z","body":"test","platforms":null,"tags":null,"tagString":""}]`,
 		},
 	}
 
