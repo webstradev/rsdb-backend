@@ -14,6 +14,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/webstradev/rsdb-backend/auth"
 	"github.com/webstradev/rsdb-backend/controllers"
+	"github.com/webstradev/rsdb-backend/controllers/articles"
 	"github.com/webstradev/rsdb-backend/controllers/platforms"
 	"github.com/webstradev/rsdb-backend/db"
 	"github.com/webstradev/rsdb-backend/middlewares"
@@ -86,6 +87,9 @@ func main() {
 	api.POST("/platforms/:platformId/contacts", platforms.CreateContact(env))
 	api.PUT("/platforms/:platformId/contacts/:id", platforms.EditContact(env))
 	api.DELETE("/platforms/:platformId/contacts/:id", platforms.DeleteContact(env))
+
+	// Articles
+	api.GET("/articles", middlewares.PaginationMiddleware(), articles.GetArticles(env))
 
 	// Server object
 	s := &http.Server{
