@@ -41,7 +41,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	jwtService, err := auth.CreateJWTService(os.Getenv("JWT_SIGNING_SECRET"), os.Getenv("JWT_ISSUER"), 3650*24*time.Hour)
+	jwtService, err := auth.CreateJWTService(os.Getenv("JWT_SIGNING_SECRET"), os.Getenv("JWT_ISSUER"), 24*time.Hour)
 	if err != nil {
 		log.Fatal(err)
 	}
