@@ -90,6 +90,7 @@ func main() {
 
 	// Articles
 	api.GET("/articles", middlewares.PaginationMiddleware(), articles.GetArticles(env))
+	api.POST("/articles", articles.CreateArticle(env))
 
 	// Server object
 	s := &http.Server{
