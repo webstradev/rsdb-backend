@@ -1,4 +1,4 @@
-package controllers
+package platforms
 
 import (
 	"log"
@@ -9,7 +9,7 @@ import (
 	"github.com/webstradev/rsdb-backend/utils"
 )
 
-func GetPlatform(env *utils.Environment) gin.HandlerFunc {
+func GetContacts(env *utils.Environment) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		idString := c.Param("platformId")
 
@@ -20,20 +20,13 @@ func GetPlatform(env *utils.Environment) gin.HandlerFunc {
 			return
 		}
 
-		platform, err := env.DB.GetPlatform(id)
+		contacts, err := env.DB.GetContactsForPlatform(id)
 		if err != nil {
 			log.Println(err)
 			c.AbortWithStatus(http.StatusInternalServerError)
 			return
 		}
 
-		err = platform.PopulateCategories(env.DB)
-		if err != nil {
-			log.Println(err)
-			c.AbortWithStatus(http.StatusInternalServerError)
-			return
-		}
-
-		c.JSON(http.StatusOK, platform)
+		c.JSON(http.StatusOK, contacts)
 	}
 }

@@ -1,4 +1,4 @@
-package controllers
+package platforms
 
 import (
 	"log"
@@ -9,24 +9,23 @@ import (
 	"github.com/webstradev/rsdb-backend/utils"
 )
 
-func GetContacts(env *utils.Environment) gin.HandlerFunc {
+func DeletePlatform(env *utils.Environment) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		idString := c.Param("platformId")
-
 		id, err := strconv.ParseInt(idString, 10, 64)
 		if err != nil {
 			log.Println(err)
-			c.AbortWithStatus(http.StatusBadRequest)
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
 			return
 		}
 
-		contacts, err := env.DB.GetContactsForPlatform(id)
+		err = env.DB.DeletePlatform(id)
 		if err != nil {
 			log.Println(err)
 			c.AbortWithStatus(http.StatusInternalServerError)
 			return
 		}
 
-		c.JSON(http.StatusOK, contacts)
+		c.JSON(http.StatusOK, gin.H{"message": "Platform deleted successfully"})
 	}
 }

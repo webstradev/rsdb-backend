@@ -1,4 +1,4 @@
-package controllers
+package platforms
 
 import (
 	"errors"
@@ -6,7 +6,6 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
-	"strings"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
@@ -14,64 +13,38 @@ import (
 	"github.com/webstradev/rsdb-backend/utils"
 )
 
-func TestEditContact(t *testing.T) {
+func TestDeletePlatform(t *testing.T) {
 	tests := []struct {
-		Name             string
-		IdString         string
-		PlatformIdString string
-		MockDbCall       func(sqlmock.Sqlmock)
-		StatusCode       int
-		Body             string
-		Response         string
+		Name       string
+		IdString   string
+		MockDbCall func(sqlmock.Sqlmock)
+		StatusCode int
+		Response   string
 	}{
 		{
-			"EditContact - non int id",
-			"notanint",
+			"DeletePlatform - non int id",
 			"notanint",
 			nil,
 			http.StatusBadRequest,
-			`{}`,
 			`{"error":"Invalid ID"}`,
 		},
 		{
-			"EditContact - non int platformId",
-			"1",
-			"notanint",
-			nil,
-			http.StatusBadRequest,
-			`{}`,
-			`{"error":"Invalid Platform ID"}`,
-		},
-		{
-			"EditContact - Bad json body",
-			"1",
-			"1",
-			nil,
-			http.StatusBadRequest,
-			`{badbody}`,
-			`{"error": "invalid character 'b' looking for beginning of object key string"}`,
-		},
-		{
-			"EditContact - sql error on EditPlatform",
-			"1",
+			"DeletePlatform - sql error on DeletePlatform",
 			"1",
 			func(mock sqlmock.Sqlmock) {
-				mock.ExpectExec("UPDATE contacts SET").WillReturnError(errors.New("test"))
+				mock.ExpectExec("UPDATE platforms SET").WillReturnError(errors.New("test"))
 			},
 			http.StatusInternalServerError,
-			`{"name":"test","title":"test","email":"test","phone":"","phone2":"","address":"","notes":"","source":"test","privacy":"test"}`,
 			`{}`,
 		},
 		{
-			"EditPlatform - Valid Request",
-			"1",
+			"DeletePlatform - Valid Request",
 			"1",
 			func(mock sqlmock.Sqlmock) {
-				mock.ExpectExec("UPDATE contacts SET").WillReturnResult(sqlmock.NewResult(1, 1))
+				mock.ExpectExec("UPDATE platforms SET").WillReturnResult(sqlmock.NewResult(1, 1))
 			},
 			http.StatusOK,
-			`{"name":"test","title":"test","email":"test","phone":"","phone2":"","address":"","notes":"","source":"test","privacy":"test"}`,
-			`{}`,
+			`{"message": "Platform deleted successfully"}`,
 		},
 	}
 
@@ -86,10 +59,10 @@ func TestEditContact(t *testing.T) {
 			require.NoError(t, err)
 
 			// Register handler
-			r.PUT("/api/v1/platforms/:platformId/contacts/:id", EditContact(env))
+			r.DELETE("/api/v1/platforms/:platformId", DeletePlatform(env))
 
 			// Create httptest request
-			req, _ := http.NewRequest("PUT", fmt.Sprintf("/api/v1/platforms/%s/contacts/%s", test.PlatformIdString, test.IdString), strings.NewReader(test.Body))
+			req, _ := http.NewRequest("DELETE", fmt.Sprintf("/api/v1/platforms/%s", test.IdString), nil)
 			w := httptest.NewRecorder()
 
 			// Mock request

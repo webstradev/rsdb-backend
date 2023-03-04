@@ -1,4 +1,4 @@
-package controllers
+package platforms
 
 import (
 	"errors"
@@ -13,38 +13,50 @@ import (
 	"github.com/webstradev/rsdb-backend/utils"
 )
 
-func TestDeletePlatform(t *testing.T) {
+func TestDeleteContact(t *testing.T) {
 	tests := []struct {
-		Name       string
-		IdString   string
-		MockDbCall func(sqlmock.Sqlmock)
-		StatusCode int
-		Response   string
+		Name             string
+		IdString         string
+		PlatformIdString string
+		MockDbCall       func(sqlmock.Sqlmock)
+		StatusCode       int
+		Response         string
 	}{
 		{
-			"DeletePlatform - non int id",
+			"DeleteContact - non int id",
+			"notanint",
 			"notanint",
 			nil,
 			http.StatusBadRequest,
 			`{"error":"Invalid ID"}`,
 		},
 		{
-			"DeletePlatform - sql error on DeletePlatform",
+			"DeleteContact - non int platformId",
+			"1",
+			"notanint",
+			nil,
+			http.StatusBadRequest,
+			`{"error":"Invalid Platform ID"}`,
+		},
+		{
+			"DeleteContact - sql error on DeleteContact",
+			"1",
 			"1",
 			func(mock sqlmock.Sqlmock) {
-				mock.ExpectExec("UPDATE platforms SET").WillReturnError(errors.New("test"))
+				mock.ExpectExec("UPDATE contacts SET").WillReturnError(errors.New("test"))
 			},
 			http.StatusInternalServerError,
 			`{}`,
 		},
 		{
-			"DeletePlatform - Valid Request",
+			"DeleteContact - Valid Request",
+			"1",
 			"1",
 			func(mock sqlmock.Sqlmock) {
-				mock.ExpectExec("UPDATE platforms SET").WillReturnResult(sqlmock.NewResult(1, 1))
+				mock.ExpectExec("UPDATE contacts SET").WillReturnResult(sqlmock.NewResult(1, 1))
 			},
 			http.StatusOK,
-			`{"message": "Platform deleted successfully"}`,
+			`{"message": "Contact deleted successfully"}`,
 		},
 	}
 
@@ -59,10 +71,10 @@ func TestDeletePlatform(t *testing.T) {
 			require.NoError(t, err)
 
 			// Register handler
-			r.DELETE("/api/v1/platforms/:platformId", DeletePlatform(env))
+			r.DELETE("/api/v1/platforms/:platformId/contacts/:id", DeleteContact(env))
 
 			// Create httptest request
-			req, _ := http.NewRequest("DELETE", fmt.Sprintf("/api/v1/platforms/%s", test.IdString), nil)
+			req, _ := http.NewRequest("DELETE", fmt.Sprintf("/api/v1/platforms/%s/contacts/%s", test.PlatformIdString, test.IdString), nil)
 			w := httptest.NewRecorder()
 
 			// Mock request

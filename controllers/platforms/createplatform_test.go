@@ -1,8 +1,7 @@
-package controllers
+package platforms
 
 import (
 	"errors"
-	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -14,60 +13,34 @@ import (
 	"github.com/webstradev/rsdb-backend/utils"
 )
 
-func TestEditPlatform(t *testing.T) {
+func TestCreatePlatform(t *testing.T) {
 	tests := []struct {
 		Name       string
-		IdString   string
 		MockDbCall func(sqlmock.Sqlmock)
 		StatusCode int
 		Body       string
 		Response   string
 	}{
 		{
-			"EditPlatform - non int id",
-			"notanint",
+			"CreatePlatform - missing required fields",
 			nil,
 			http.StatusBadRequest,
 			`{}`,
-			`{"error":"Invalid ID"}`,
+			`{"error":"Key: 'createPlatformInput.Name' Error:Field validation for 'Name' failed on the 'required' tag\nKey: 'createPlatformInput.Country' Error:Field validation for 'Country' failed on the 'required' tag\nKey: 'createPlatformInput.Privacy' Error:Field validation for 'Privacy' failed on the 'required' tag\nKey: 'createPlatformInput.Categories' Error:Field validation for 'Categories' failed on the 'required' tag"}`,
 		},
 		{
-			"EditPlatform - missing required fields",
-			"1",
-			nil,
-			http.StatusBadRequest,
-			`{}`,
-			`{"error":"Key: 'editPlatformInput.Name' Error:Field validation for 'Name' failed on the 'required' tag\nKey: 'editPlatformInput.Country' Error:Field validation for 'Country' failed on the 'required' tag\nKey: 'editPlatformInput.Privacy' Error:Field validation for 'Privacy' failed on the 'required' tag\nKey: 'editPlatformInput.Categories' Error:Field validation for 'Categories' failed on the 'required' tag"}`,
-		},
-		{
-			"EditPlatform - sql error on EditPlatform",
-			"1",
+			"CreatePlatform - sql error on CreatePlatform",
 			func(mock sqlmock.Sqlmock) {
-				mock.ExpectExec("UPDATE platforms SET").WillReturnError(errors.New("test"))
+				mock.ExpectExec("INSERT INTO platforms").WillReturnError(errors.New("test"))
 			},
 			http.StatusInternalServerError,
 			`{"name":"test", "country":"test", "privacy":"Private", "categories":[]}`,
 			`{}`,
 		},
 		{
-			"EditPlatform - sql error on UpdatePlatformCategories(DELETE)",
-			"1",
+			"CreatePlatform - sql error on UpdatePlatformCategories(INSERT)",
 			func(mock sqlmock.Sqlmock) {
-				mock.ExpectExec("UPDATE platforms SET").WillReturnResult(sqlmock.NewResult(1, 1))
-
-				mock.ExpectExec("DELETE FROM platforms_categories").WillReturnError(errors.New("test"))
-			},
-			http.StatusInternalServerError,
-			`{"name":"test", "country":"test", "privacy":"Private", "categories":[]}`,
-			`{}`,
-		},
-		{
-			"EditPlatform - sql error on UpdatePlatformCategories(INSERT)",
-			"1",
-			func(mock sqlmock.Sqlmock) {
-				mock.ExpectExec("UPDATE platforms SET").WillReturnResult(sqlmock.NewResult(1, 1))
-
-				mock.ExpectExec("DELETE FROM platforms_categories").WillReturnResult(sqlmock.NewResult(1, 1))
+				mock.ExpectExec("INSERT INTO platforms").WillReturnResult(sqlmock.NewResult(1, 1))
 
 				mock.ExpectExec("INSERT INTO platforms_categories").WillReturnError(errors.New("test"))
 			},
@@ -76,12 +49,9 @@ func TestEditPlatform(t *testing.T) {
 			`{}`,
 		},
 		{
-			"EditPlatform - Valid Request",
-			"1",
+			"CreatePlatform - Valid Request",
 			func(mock sqlmock.Sqlmock) {
-				mock.ExpectExec("UPDATE platforms SET").WillReturnResult(sqlmock.NewResult(1, 1))
-
-				mock.ExpectExec("DELETE FROM platforms_categories").WillReturnResult(sqlmock.NewResult(1, 1))
+				mock.ExpectExec("INSERT INTO platforms").WillReturnResult(sqlmock.NewResult(1, 1))
 
 				mock.ExpectExec("INSERT INTO platforms_categories").WillReturnResult(sqlmock.NewResult(1, 1))
 			},
@@ -102,10 +72,10 @@ func TestEditPlatform(t *testing.T) {
 			require.NoError(t, err)
 
 			// Register handler
-			r.PUT("/api/v1/platforms/:platformId", EditPlatform(env))
+			r.POST("/api/v1/platforms", CreatePlatform(env))
 
 			// Create httptest request
-			req, _ := http.NewRequest("PUT", fmt.Sprintf("/api/v1/platforms/%s", test.IdString), strings.NewReader(test.Body))
+			req, _ := http.NewRequest("POST", "/api/v1/platforms", strings.NewReader(test.Body))
 			w := httptest.NewRecorder()
 
 			// Mock request

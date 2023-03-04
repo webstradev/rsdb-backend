@@ -14,6 +14,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/webstradev/rsdb-backend/auth"
 	"github.com/webstradev/rsdb-backend/controllers"
+	"github.com/webstradev/rsdb-backend/controllers/platforms"
 	"github.com/webstradev/rsdb-backend/db"
 	"github.com/webstradev/rsdb-backend/middlewares"
 	"github.com/webstradev/rsdb-backend/migrations"
@@ -74,17 +75,17 @@ func main() {
 	api.GET("/counts", controllers.GetCounts(env))
 
 	// Platforms
-	api.GET("/platforms", middlewares.PaginationMiddleware(), controllers.GetPlatforms(env))
-	api.POST("/platforms", controllers.CreatePlatform(env))
-	api.GET("/platforms/:platformId", controllers.GetPlatform(env))
-	api.PUT("/platforms/:platformId", controllers.EditPlatform(env))
-	api.DELETE("/platforms/:platformId", controllers.DeletePlatform(env))
+	api.GET("/platforms", middlewares.PaginationMiddleware(), platforms.GetPlatforms(env))
+	api.POST("/platforms", platforms.CreatePlatform(env))
+	api.GET("/platforms/:platformId", platforms.GetPlatform(env))
+	api.PUT("/platforms/:platformId", platforms.EditPlatform(env))
+	api.DELETE("/platforms/:platformId", platforms.DeletePlatform(env))
 
 	// Contacts
-	api.GET("/platforms/:platformId/contacts", controllers.GetContacts(env))
-	api.POST("/platforms/:platformId/contacts", controllers.CreateContact(env))
-	api.PUT("/platforms/:platformId/contacts/:id", controllers.EditContact(env))
-	api.DELETE("/platforms/:platformId/contacts/:id", controllers.DeleteContact(env))
+	api.GET("/platforms/:platformId/contacts", platforms.GetContacts(env))
+	api.POST("/platforms/:platformId/contacts", platforms.CreateContact(env))
+	api.PUT("/platforms/:platformId/contacts/:id", platforms.EditContact(env))
+	api.DELETE("/platforms/:platformId/contacts/:id", platforms.DeleteContact(env))
 
 	// Server object
 	s := &http.Server{

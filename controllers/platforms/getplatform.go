@@ -1,4 +1,4 @@
-package controllers
+package platforms
 
 import (
 	"log"
@@ -9,23 +9,31 @@ import (
 	"github.com/webstradev/rsdb-backend/utils"
 )
 
-func DeletePlatform(env *utils.Environment) gin.HandlerFunc {
+func GetPlatform(env *utils.Environment) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		idString := c.Param("platformId")
+
 		id, err := strconv.ParseInt(idString, 10, 64)
 		if err != nil {
 			log.Println(err)
-			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
+			c.AbortWithStatus(http.StatusBadRequest)
 			return
 		}
 
-		err = env.DB.DeletePlatform(id)
+		platform, err := env.DB.GetPlatform(id)
 		if err != nil {
 			log.Println(err)
 			c.AbortWithStatus(http.StatusInternalServerError)
 			return
 		}
 
-		c.JSON(http.StatusOK, gin.H{"message": "Platform deleted successfully"})
+		err = platform.PopulateCategories(env.DB)
+		if err != nil {
+			log.Println(err)
+			c.AbortWithStatus(http.StatusInternalServerError)
+			return
+		}
+
+		c.JSON(http.StatusOK, platform)
 	}
 }
