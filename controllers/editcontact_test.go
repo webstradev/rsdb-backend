@@ -16,15 +16,17 @@ import (
 
 func TestEditContact(t *testing.T) {
 	tests := []struct {
-		Name       string
-		IdString   string
-		MockDbCall func(sqlmock.Sqlmock)
-		StatusCode int
-		Body       string
-		Response   string
+		Name             string
+		IdString         string
+		PlatformIdString string
+		MockDbCall       func(sqlmock.Sqlmock)
+		StatusCode       int
+		Body             string
+		Response         string
 	}{
 		{
 			"EditContact - non int id",
+			"notanint",
 			"notanint",
 			nil,
 			http.StatusBadRequest,
@@ -32,7 +34,17 @@ func TestEditContact(t *testing.T) {
 			`{"error":"Invalid ID"}`,
 		},
 		{
+			"EditContact - non int platformId",
+			"1",
+			"notanint",
+			nil,
+			http.StatusBadRequest,
+			`{}`,
+			`{"error":"Invalid Platform ID"}`,
+		},
+		{
 			"EditContact - Bad json body",
+			"1",
 			"1",
 			nil,
 			http.StatusBadRequest,
@@ -41,6 +53,7 @@ func TestEditContact(t *testing.T) {
 		},
 		{
 			"EditContact - sql error on EditPlatform",
+			"1",
 			"1",
 			func(mock sqlmock.Sqlmock) {
 				mock.ExpectExec("UPDATE contacts SET").WillReturnError(errors.New("test"))
@@ -51,6 +64,7 @@ func TestEditContact(t *testing.T) {
 		},
 		{
 			"EditPlatform - Valid Request",
+			"1",
 			"1",
 			func(mock sqlmock.Sqlmock) {
 				mock.ExpectExec("UPDATE contacts SET").WillReturnResult(sqlmock.NewResult(1, 1))
@@ -72,10 +86,10 @@ func TestEditContact(t *testing.T) {
 			require.NoError(t, err)
 
 			// Register handler
-			r.PUT("/api/v1/contacts/:id", EditContact(env))
+			r.PUT("/api/v1/platforms/:platformId/contacts/:id", EditContact(env))
 
 			// Create httptest request
-			req, _ := http.NewRequest("PUT", fmt.Sprintf("/api/v1/contacts/%s", test.IdString), strings.NewReader(test.Body))
+			req, _ := http.NewRequest("PUT", fmt.Sprintf("/api/v1/platforms/%s/contacts/%s", test.PlatformIdString, test.IdString), strings.NewReader(test.Body))
 			w := httptest.NewRecorder()
 
 			// Mock request

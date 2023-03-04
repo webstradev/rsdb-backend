@@ -39,7 +39,7 @@ func (db *Database) EditContact(contact Contact) error {
 			notes = :notes, 
 			source = :source, 
 			privacy = :privacy 
-		WHERE id = :id`, contact)
+		WHERE id = :id AND platform_id = :platform_id`, contact)
 	return err
 }
 

@@ -21,6 +21,14 @@ func EditContact(env *utils.Environment) gin.HandlerFunc {
 			return
 		}
 
+		platformIdString := c.Param("platformId")
+		platformId, err := strconv.ParseInt(platformIdString, 10, 64)
+		if err != nil {
+			log.Println(err)
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Invalid Platform ID"})
+			return
+		}
+
 		// Validate Input
 		contact := db.Contact{}
 		err = c.ShouldBindJSON(&contact)
@@ -31,6 +39,7 @@ func EditContact(env *utils.Environment) gin.HandlerFunc {
 		}
 
 		contact.ID = id
+		contact.PlatformId = platformId
 
 		err = env.DB.EditContact(contact)
 		if err != nil {
