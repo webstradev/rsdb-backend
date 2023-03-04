@@ -13,40 +13,50 @@ import (
 	"github.com/webstradev/rsdb-backend/utils"
 )
 
-func TestGetContacts(t *testing.T) {
+func TestDeleteContact(t *testing.T) {
 	tests := []struct {
-		Name       string
-		IdString   string
-		MockDbCall func(sqlmock.Sqlmock)
-		StatusCode int
-		Response   string
+		Name             string
+		IdString         string
+		PlatformIdString string
+		MockDbCall       func(sqlmock.Sqlmock)
+		StatusCode       int
+		Response         string
 	}{
 		{
-			"GetContacts - non int id",
+			"DeleteContact - non int id",
+			"notanint",
 			"notanint",
 			nil,
 			http.StatusBadRequest,
-			`{}`,
+			`{"error":"Invalid ID"}`,
 		},
 		{
-			"GetContacts - sql error on GetPlatform",
+			"DeleteContact - non int platformId",
+			"1",
+			"notanint",
+			nil,
+			http.StatusBadRequest,
+			`{"error":"Invalid Platform ID"}`,
+		},
+		{
+			"DeleteContact - sql error on DeleteContact",
+			"1",
 			"1",
 			func(mock sqlmock.Sqlmock) {
-				mock.ExpectQuery("SELECT .+ FROM contacts").WithArgs(1).WillReturnError(errors.New("test"))
+				mock.ExpectExec("UPDATE contacts SET").WillReturnError(errors.New("test"))
 			},
 			http.StatusInternalServerError,
 			`{}`,
 		},
 		{
-			"GetContacts - Valid Request",
+			"DeleteContact - Valid Request",
+			"1",
 			"1",
 			func(mock sqlmock.Sqlmock) {
-				rows := sqlmock.NewRows([]string{"id", "name", "title", "email", "phone", "phone2", "address", "notes", "source", "privacy", "platform_id"}).
-					AddRow(1, "test", "test", "test", "test", "test", "test", "test", "test", "test", 1)
-				mock.ExpectQuery("SELECT .+ FROM contacts").WithArgs(1).WillReturnRows(rows)
+				mock.ExpectExec("UPDATE contacts SET").WillReturnResult(sqlmock.NewResult(1, 1))
 			},
 			http.StatusOK,
-			`[{"platformId":1,"id":1,"createdAt":"0001-01-01T00:00:00Z","modifiedAt":"0001-01-01T00:00:00Z","deletedAt":{"Time":"0001-01-01T00:00:00Z","Valid":false},"name":"test","title":"test","email":"test","phone":"test","phone2":"test","address":"test","notes":"test","source":"test","privacy":"test"}]`,
+			`{"message": "Contact deleted successfully"}`,
 		},
 	}
 
@@ -61,10 +71,10 @@ func TestGetContacts(t *testing.T) {
 			require.NoError(t, err)
 
 			// Register handler
-			r.GET("/api/platforms/:platformId/contacts", GetContacts(env))
+			r.DELETE("/api/v1/platforms/:platformId/contacts/:id", DeleteContact(env))
 
 			// Create httptest request
-			req, _ := http.NewRequest("GET", fmt.Sprintf("/api/platforms/%s/contacts", test.IdString), nil)
+			req, _ := http.NewRequest("DELETE", fmt.Sprintf("/api/v1/platforms/%s/contacts/%s", test.PlatformIdString, test.IdString), nil)
 			w := httptest.NewRecorder()
 
 			// Mock request

@@ -76,14 +76,15 @@ func main() {
 	// Platforms
 	api.GET("/platforms", middlewares.PaginationMiddleware(), controllers.GetPlatforms(env))
 	api.POST("/platforms", controllers.CreatePlatform(env))
-	api.GET("/platforms/:id", controllers.GetPlatform(env))
-	api.PUT("/platforms/:id", controllers.EditPlatform(env))
-	api.DELETE("/platforms/:id", controllers.DeletePlatform(env))
+	api.GET("/platforms/:platformId", controllers.GetPlatform(env))
+	api.PUT("/platforms/:platformId", controllers.EditPlatform(env))
+	api.DELETE("/platforms/:platformId", controllers.DeletePlatform(env))
 
 	// Contacts
-	api.GET("/platforms/:id/contacts", controllers.GetContacts(env))
-	api.POST("/platforms/:id/contacts", controllers.CreateContact(env))
+	api.GET("/platforms/:platformId/contacts", controllers.GetContacts(env))
+	api.POST("/platforms/:platformId/contacts", controllers.CreateContact(env))
 	api.PUT("/platforms/:platformId/contacts/:id", controllers.EditContact(env))
+	api.DELETE("/platforms/:platformId/contacts/:id", controllers.DeleteContact(env))
 
 	// Server object
 	s := &http.Server{

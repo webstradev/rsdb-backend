@@ -72,7 +72,7 @@ func TestCreateContact(t *testing.T) {
 			require.NoError(t, err)
 
 			// Register handler
-			r.POST("/api/v1/platforms/:id/contacts", CreateContact(env))
+			r.POST("/api/v1/platforms/:platformId/contacts", CreateContact(env))
 
 			// Create httptest request
 			req, _ := http.NewRequest("POST", fmt.Sprintf("/api/v1/platforms/%s/contacts", test.IdString), strings.NewReader(test.Body))

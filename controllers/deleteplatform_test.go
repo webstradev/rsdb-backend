@@ -59,7 +59,7 @@ func TestDeletePlatform(t *testing.T) {
 			require.NoError(t, err)
 
 			// Register handler
-			r.DELETE("/api/v1/platforms/:id", DeletePlatform(env))
+			r.DELETE("/api/v1/platforms/:platformId", DeletePlatform(env))
 
 			// Create httptest request
 			req, _ := http.NewRequest("DELETE", fmt.Sprintf("/api/v1/platforms/%s", test.IdString), nil)

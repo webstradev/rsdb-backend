@@ -78,7 +78,7 @@ func TestGetPlatform(t *testing.T) {
 			require.NoError(t, err)
 
 			// Register handler
-			r.GET("/api/platforms/:id", GetPlatform(env))
+			r.GET("/api/platforms/:platformId", GetPlatform(env))
 
 			// Create httptest request
 			req, _ := http.NewRequest("GET", fmt.Sprintf("/api/platforms/%s", test.IdString), nil)

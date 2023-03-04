@@ -13,7 +13,7 @@ import (
 func CreateContact(env *utils.Environment) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Get contactId from URL
-		idString := c.Param("id")
+		idString := c.Param("platformId")
 		platformId, err := strconv.ParseInt(idString, 10, 64)
 		if err != nil {
 			log.Println(err)

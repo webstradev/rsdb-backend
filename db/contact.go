@@ -51,3 +51,8 @@ func (db *Database) InsertContact(contact Contact) error {
 			(:name, :title, :email, :phone, :phone2, :address, :notes, :source, :privacy, :platform_id)`, contact)
 	return err
 }
+
+func (db *Database) DeleteContact(id, platformId int64) error {
+	_, err := db.querier.Exec("UPDATE contacts SET deleted_at = CURRENT_TIMESTAMP() WHERE id = ? AND platform_id = ?", id, platformId)
+	return err
+}

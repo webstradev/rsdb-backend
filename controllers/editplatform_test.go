@@ -102,7 +102,7 @@ func TestEditPlatform(t *testing.T) {
 			require.NoError(t, err)
 
 			// Register handler
-			r.PUT("/api/v1/platforms/:id", EditPlatform(env))
+			r.PUT("/api/v1/platforms/:platformId", EditPlatform(env))
 
 			// Create httptest request
 			req, _ := http.NewRequest("PUT", fmt.Sprintf("/api/v1/platforms/%s", test.IdString), strings.NewReader(test.Body))
