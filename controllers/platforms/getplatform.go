@@ -1,6 +1,8 @@
 package platforms
 
 import (
+	"database/sql"
+	"errors"
 	"log"
 	"net/http"
 	"strconv"
@@ -22,6 +24,10 @@ func GetPlatform(env *utils.Environment) gin.HandlerFunc {
 
 		platform, err := env.DB.GetPlatform(id)
 		if err != nil {
+			if errors.Is(err, sql.ErrNoRows) {
+				c.AbortWithStatus(http.StatusNotFound)
+				return
+			}
 			log.Println(err)
 			c.AbortWithStatus(http.StatusInternalServerError)
 			return

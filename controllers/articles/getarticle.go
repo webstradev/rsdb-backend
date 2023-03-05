@@ -1,6 +1,8 @@
 package articles
 
 import (
+	"database/sql"
+	"errors"
 	"log"
 	"net/http"
 	"strconv"
@@ -22,6 +24,10 @@ func GetArticle(env *utils.Environment) gin.HandlerFunc {
 
 		article, err := env.DB.GetArticle(id)
 		if err != nil {
+			if errors.Is(err, sql.ErrNoRows) {
+				c.AbortWithStatus(http.StatusNotFound)
+				return
+			}
 			log.Println(err)
 			c.AbortWithStatus(http.StatusInternalServerError)
 			return
