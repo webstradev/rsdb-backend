@@ -93,6 +93,7 @@ func main() {
 	api.POST("/articles", articles.CreateArticle(env))
 	api.GET("/articles/:articleId", articles.GetArticle(env))
 	api.PUT("/articles/:articleId", articles.EditArticle(env))
+	api.DELETE("/articles/:articleId", articles.DeleteArticle(env))
 
 	// Server object
 	s := &http.Server{

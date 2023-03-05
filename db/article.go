@@ -76,7 +76,6 @@ func (db *Database) GetArticle(id int64) (Article, error) {
 	article := Article{}
 
 	err := db.querier.Get(&article, "SELECT a.* FROM articles a WHERE a.id = ? AND a.deleted_at IS NULL", id)
-
 	return article, err
 }
 
@@ -274,4 +273,9 @@ func (db *Database) EditArticle(article Article) error {
 	}
 
 	return nil
+}
+
+func (db *Database) DeleteArticle(id int64) error {
+	_, err := db.querier.Exec("UPDATE articles SET deleted_at = CURRENT_TIMESTAMP() WHERE id = ?", id)
+	return err
 }
