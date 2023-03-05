@@ -4,6 +4,8 @@ import (
 	"log"
 	"strings"
 	"time"
+
+	"github.com/jmoiron/sqlx"
 )
 
 type Article struct {
@@ -26,6 +28,26 @@ func (db *Database) CountArticles() (int, error) {
 	var count int
 	err := db.querier.Get(&count, "SELECT COUNT(*) AS count FROM articles WHERE deleted_at IS NULL")
 	return count, err
+}
+
+func (a *Article) TagIds() []int64 {
+	ids := []int64{}
+
+	for _, tag := range a.Tags {
+		ids = append(ids, tag.TagId)
+	}
+
+	return ids
+}
+
+func (a *Article) PlatformIds() []int64 {
+	ids := []int64{}
+
+	for _, tag := range a.Platforms {
+		ids = append(ids, tag.PlatformId)
+	}
+
+	return ids
 }
 
 func (a *Article) PopulateTags(db *Database) error {
@@ -129,6 +151,31 @@ func (db *Database) InsertArticleTags(articleId int64, tags []int64) error {
 	return nil
 }
 
+func (db *Database) InsertArticleTagsTx(tx *sqlx.Tx, articleID int64, tagIDs []int64) error {
+	if len(tagIDs) == 0 {
+		return nil
+	}
+
+	// Build the query and arguments
+	query := "INSERT INTO articles_tags (tag_id, article_id) VALUES "
+	args := make([]interface{}, 0, len(tagIDs)*2)
+	for i, platformID := range tagIDs {
+		query += "(?, ?),"
+		args = append(args, platformID, articleID)
+		if i == len(tagIDs)-1 {
+			query = query[:len(query)-1]
+		}
+	}
+
+	// Execute the query
+	_, err := tx.Exec(query, args...)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (db *Database) InsertArticlePlatforms(articleId int64, platforms []int64) error {
 	// If there are no categories, we're done
 	if len(platforms) == 0 {
@@ -151,6 +198,77 @@ func (db *Database) InsertArticlePlatforms(articleId int64, platforms []int64) e
 	query = strings.TrimRight(query, ",")
 
 	_, err := db.querier.Exec(query, args...)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (db *Database) InsertArticlePlatformsTx(tx *sqlx.Tx, articleID int64, platforms []int64) error {
+	if len(platforms) == 0 {
+		return nil
+	}
+
+	// Build the query and arguments
+	query := "INSERT INTO platforms_articles (platform_id, article_id) VALUES "
+	args := make([]interface{}, 0, len(platforms)*2)
+	for i, platformID := range platforms {
+		query += "(?, ?),"
+		args = append(args, platformID, articleID)
+		if i == len(platforms)-1 {
+			query = query[:len(query)-1]
+		}
+	}
+
+	// Execute the query
+	_, err := tx.Exec(query, args...)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (db *Database) EditArticle(article Article) error {
+	tx, err := db.querier.Beginx()
+	if err != nil {
+		return err
+	}
+
+	_, err = tx.NamedExec(`
+    UPDATE articles SET title = :title, description = :description, link = :link, date = :date, body = :body
+    WHERE id = :id`, article)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	_, err = tx.Exec("DELETE FROM articles_tags WHERE article_id = ?", article.ID)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	err = db.InsertArticleTagsTx(tx, article.ID, article.TagIds())
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	_, err = tx.Exec("DELETE FROM platforms_articles WHERE article_id = ?", article.ID)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	err = db.InsertArticlePlatformsTx(tx, article.ID, article.PlatformIds())
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	err = tx.Commit()
 	if err != nil {
 		return err
 	}
