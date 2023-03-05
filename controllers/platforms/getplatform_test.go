@@ -1,6 +1,7 @@
 package platforms
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 	"io"
@@ -35,6 +36,15 @@ func TestGetPlatform(t *testing.T) {
 				mock.ExpectQuery("SELECT p.(.+)").WithArgs(1).WillReturnError(errors.New("test"))
 			},
 			http.StatusInternalServerError,
+			`{}`,
+		},
+		{
+			"GetPlatform - platform not found",
+			"1",
+			func(mock sqlmock.Sqlmock) {
+				mock.ExpectQuery("SELECT p.(.+)").WithArgs(1).WillReturnError(sql.ErrNoRows)
+			},
+			http.StatusNotFound,
 			`{}`,
 		},
 		{

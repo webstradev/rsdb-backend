@@ -1,6 +1,7 @@
 package articles
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 	"io"
@@ -42,6 +43,15 @@ func TestGetArticle(t *testing.T) {
 				mock.ExpectQuery("SELECT a.(.+)").WithArgs(1).WillReturnError(errors.New("test"))
 			},
 			http.StatusInternalServerError,
+			`{}`,
+		},
+		{
+			"GetArticle - article not found",
+			"1",
+			func(mock sqlmock.Sqlmock) {
+				mock.ExpectQuery("SELECT a.(.+)").WithArgs(1).WillReturnError(sql.ErrNoRows)
+			},
+			http.StatusNotFound,
 			`{}`,
 		},
 		{
