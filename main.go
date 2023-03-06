@@ -16,6 +16,7 @@ import (
 	"github.com/webstradev/rsdb-backend/controllers"
 	"github.com/webstradev/rsdb-backend/controllers/articles"
 	"github.com/webstradev/rsdb-backend/controllers/platforms"
+	"github.com/webstradev/rsdb-backend/controllers/projects"
 	"github.com/webstradev/rsdb-backend/db"
 	"github.com/webstradev/rsdb-backend/middlewares"
 	"github.com/webstradev/rsdb-backend/migrations"
@@ -94,6 +95,9 @@ func main() {
 	api.GET("/articles/:articleId", articles.GetArticle(env))
 	api.PUT("/articles/:articleId", articles.EditArticle(env))
 	api.DELETE("/articles/:articleId", articles.DeleteArticle(env))
+
+	// Projects
+	api.GET("/projects", middlewares.PaginationMiddleware(), projects.GetProjects(env))
 
 	// Server object
 	s := &http.Server{
