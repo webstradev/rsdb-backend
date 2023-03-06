@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"log"
 	"strings"
+
+	"github.com/jmoiron/sqlx"
 )
 
 type Project struct {
@@ -37,6 +39,26 @@ func (p *Project) PopulateTags(db *Database) error {
 	p.Tags = tags
 
 	return nil
+}
+
+func (p *Project) TagIds() []int64 {
+	ids := []int64{}
+
+	for _, tag := range p.Tags {
+		ids = append(ids, tag.TagId)
+	}
+
+	return ids
+}
+
+func (p *Project) PlatformIds() []int64 {
+	ids := []int64{}
+
+	for _, tag := range p.Platforms {
+		ids = append(ids, tag.PlatformId)
+	}
+
+	return ids
 }
 
 func (p *Project) PopulatePlatforms(db *Database) error {
@@ -128,6 +150,31 @@ func (db *Database) InsertProjectTags(projectId int64, tags []int64) error {
 	return nil
 }
 
+func (db *Database) InsertProjectTagsTx(tx *sqlx.Tx, projectID int64, tagIDs []int64) error {
+	if len(tagIDs) == 0 {
+		return nil
+	}
+
+	// Build the query and arguments
+	query := "INSERT INTO projects_tags (tag_id, project_id) VALUES "
+	args := make([]interface{}, 0, len(tagIDs)*2)
+	for i, platformID := range tagIDs {
+		query += "(?, ?),"
+		args = append(args, platformID, projectID)
+		if i == len(tagIDs)-1 {
+			query = query[:len(query)-1]
+		}
+	}
+
+	// Execute the query
+	_, err := tx.Exec(query, args...)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (db *Database) InsertProjectPlatforms(projectId int64, platforms []int64) error {
 	// If there are no categories, we're done
 	if len(platforms) == 0 {
@@ -150,6 +197,77 @@ func (db *Database) InsertProjectPlatforms(projectId int64, platforms []int64) e
 	query = strings.TrimRight(query, ",")
 
 	_, err := db.querier.Exec(query, args...)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (db *Database) InsertProjectPlatformsTx(tx *sqlx.Tx, projectID int64, platforms []int64) error {
+	if len(platforms) == 0 {
+		return nil
+	}
+
+	// Build the query and arguments
+	query := "INSERT INTO platforms_projects (platform_id, project_id) VALUES "
+	args := make([]interface{}, 0, len(platforms)*2)
+	for i, platformID := range platforms {
+		query += "(?, ?),"
+		args = append(args, platformID, projectID)
+		if i == len(platforms)-1 {
+			query = query[:len(query)-1]
+		}
+	}
+
+	// Execute the query
+	_, err := tx.Exec(query, args...)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (db *Database) EditProject(project Project) error {
+	tx, err := db.querier.Beginx()
+	if err != nil {
+		return err
+	}
+
+	_, err = tx.NamedExec(`
+    UPDATE projects SET title = :title, description = :description, link = :link, date = :date, body = :body
+    WHERE id = :id`, project)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	_, err = tx.Exec("DELETE FROM projects_tags WHERE project_id = ?", project.ID)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	err = db.InsertProjectTagsTx(tx, project.ID, project.TagIds())
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	_, err = tx.Exec("DELETE FROM platforms_projects WHERE project_id = ?", project.ID)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	err = db.InsertProjectPlatformsTx(tx, project.ID, project.PlatformIds())
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	err = tx.Commit()
 	if err != nil {
 		return err
 	}

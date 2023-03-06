@@ -100,6 +100,7 @@ func main() {
 	api.GET("/projects", middlewares.PaginationMiddleware(), projects.GetProjects(env))
 	api.POST("/projects", projects.CreateProject(env))
 	api.GET("/projects/:projectId", projects.GetProject(env))
+	api.PUT("/projects/:projectId", projects.EditProject(env))
 
 	// Server object
 	s := &http.Server{
