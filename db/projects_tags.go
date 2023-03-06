@@ -16,7 +16,7 @@ func (db *Database) GetProjectTags(id int64) ([]ProjectTag, error) {
 	FROM 
 		tags t 
 	LEFT JOIN 
-		projects_tags at ON pt.tag_id = t.id 
+		projects_tags pt ON pt.tag_id = t.id 
 	WHERE 
 		pt.project_id = ? AND t.deleted_at IS NULL`, id)
 

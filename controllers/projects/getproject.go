@@ -1,0 +1,52 @@
+package projects
+
+import (
+	"database/sql"
+	"errors"
+	"log"
+	"net/http"
+	"strconv"
+
+	"github.com/gin-gonic/gin"
+	"github.com/webstradev/rsdb-backend/utils"
+)
+
+func GetProject(env *utils.Environment) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		idString := c.Param("projectId")
+
+		id, err := strconv.ParseInt(idString, 10, 64)
+		if err != nil {
+			log.Println(err)
+			c.AbortWithStatus(http.StatusBadRequest)
+			return
+		}
+
+		project, err := env.DB.GetProject(id)
+		if err != nil {
+			if errors.Is(err, sql.ErrNoRows) {
+				c.AbortWithStatus(http.StatusNotFound)
+				return
+			}
+			log.Println(err)
+			c.AbortWithStatus(http.StatusInternalServerError)
+			return
+		}
+
+		err = project.PopulateTags(env.DB)
+		if err != nil {
+			log.Println(err)
+			c.AbortWithStatus(http.StatusInternalServerError)
+			return
+		}
+
+		err = project.PopulatePlatforms(env.DB)
+		if err != nil {
+			log.Println(err)
+			c.AbortWithStatus(http.StatusInternalServerError)
+			return
+		}
+
+		c.JSON(http.StatusOK, project)
+	}
+}

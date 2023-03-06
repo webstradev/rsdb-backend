@@ -98,6 +98,7 @@ func main() {
 
 	// Projects
 	api.GET("/projects", middlewares.PaginationMiddleware(), projects.GetProjects(env))
+	api.GET("/projects/:projectId", projects.GetProject(env))
 
 	// Server object
 	s := &http.Server{
