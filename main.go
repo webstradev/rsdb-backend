@@ -103,6 +103,10 @@ func main() {
 	api.PUT("/projects/:projectId", projects.EditProject(env))
 	api.DELETE("/projects/:projectId", projects.DeleteProject(env))
 
+	// Admin Routes
+	admin := api.Group("/admin")
+	admin.Use(middlewares.AdminAuthMiddleware())
+
 	// Server object
 	s := &http.Server{
 		Addr:         ":8080",

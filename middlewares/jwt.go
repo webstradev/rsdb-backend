@@ -25,7 +25,7 @@ func JWTAuthMiddleware(env *utils.Environment) gin.HandlerFunc {
 			return
 		}
 
-		c.Set("user", tokenData)
+		c.Set("user", *tokenData)
 
 		c.Next()
 	}

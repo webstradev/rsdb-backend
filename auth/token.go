@@ -7,6 +7,10 @@ import (
 	"github.com/golang-jwt/jwt"
 )
 
+const (
+	AdminRole = "admin"
+)
+
 type JWTServicer interface {
 	GenerateJWTToken(userId int64, role string) (string, error)
 	ValidateJWTToken(signedString string) (*TokenData, error)
@@ -15,6 +19,10 @@ type JWTServicer interface {
 type TokenData struct {
 	UserID int64  `json:"user_id"`
 	Role   string `json:"role"`
+}
+
+func (t *TokenData) IsAdmin() bool {
+	return t.Role == AdminRole
 }
 
 type JWTService struct {

@@ -67,7 +67,7 @@ func TestJWTAuthMiddleware(t *testing.T) {
 			require.Equal(t, tt.want, c.Writer.Status())
 
 			if tt.expectedTokenData != nil {
-				require.Equal(t, tt.expectedTokenData, c.MustGet("user"))
+				require.Equal(t, *tt.expectedTokenData, c.MustGet("user"))
 			}
 		})
 	}
