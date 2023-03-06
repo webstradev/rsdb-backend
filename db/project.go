@@ -3,6 +3,7 @@ package db
 import (
 	"database/sql"
 	"log"
+	"strings"
 )
 
 type Project struct {
@@ -78,4 +79,80 @@ func (db *Database) GetProjects(page, pageSize int) ([]ProjectWithTagString, err
 	}
 
 	return projects, nil
+}
+
+func (db *Database) InsertProject(project Project) (int64, error) {
+	result, err := db.querier.NamedExec(`
+	INSERT INTO projects (title, description, link, date, body)
+	VALUES (:title, :description, :link, :date, :body)`, project)
+	if err != nil {
+		log.Println(err)
+		return 0, err
+	}
+
+	id, err := result.LastInsertId()
+	if err != nil {
+		log.Println(err)
+		return 0, err
+	}
+
+	return id, nil
+}
+
+func (db *Database) InsertProjectTags(projectId int64, tags []int64) error {
+	// If there are no tags, we're done
+	if len(tags) == 0 {
+		return nil
+	}
+
+	// Build a query and args
+	query := `INSERT INTO projects_tags (tag_id, project_id) VALUES `
+	args := []any{}
+
+	for _, tagId := range tags {
+		// Add placeholders for each category
+		query += "(?, ?),"
+
+		// Add bind arguments for each category
+		args = append(args, tagId, projectId)
+	}
+
+	// Remove the last comma
+	query = strings.TrimRight(query, ",")
+
+	_, err := db.querier.Exec(query, args...)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (db *Database) InsertProjectPlatforms(projectId int64, platforms []int64) error {
+	// If there are no categories, we're done
+	if len(platforms) == 0 {
+		return nil
+	}
+
+	// Build a query and args
+	query := `INSERT INTO platforms_projects (platform_id, project_id) VALUES `
+	args := []any{}
+
+	for _, platformId := range platforms {
+		// Add placeholders for each category
+		query += "(?, ?),"
+
+		// Add bind arguments for each category
+		args = append(args, platformId, projectId)
+	}
+
+	// Remove the last comma
+	query = strings.TrimRight(query, ",")
+
+	_, err := db.querier.Exec(query, args...)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
