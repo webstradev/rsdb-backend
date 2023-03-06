@@ -274,3 +274,8 @@ func (db *Database) EditProject(project Project) error {
 
 	return nil
 }
+
+func (db *Database) DeleteProject(id int64) error {
+	_, err := db.querier.Exec("UPDATE projects SET deleted_at = CURRENT_TIMESTAMP() WHERE id = ?", id)
+	return err
+}

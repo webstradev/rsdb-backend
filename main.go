@@ -101,6 +101,7 @@ func main() {
 	api.POST("/projects", projects.CreateProject(env))
 	api.GET("/projects/:projectId", projects.GetProject(env))
 	api.PUT("/projects/:projectId", projects.EditProject(env))
+	api.DELETE("/projects/:projectId", projects.DeleteProject(env))
 
 	// Server object
 	s := &http.Server{
