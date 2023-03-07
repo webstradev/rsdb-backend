@@ -4,6 +4,7 @@ import (
 	"errors"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 )
 
@@ -100,4 +101,13 @@ func (j *JWTService) ValidateJWTToken(signedString string) (*TokenData, error) {
 	data.SetClaims(claims)
 
 	return &data, nil
+}
+
+func GetUserFromContext(c *gin.Context) (TokenData, error) {
+	user, ok := c.Get("user")
+	if !ok {
+		return TokenData{}, errors.New("no user found in context")
+	}
+
+	return user.(TokenData), nil
 }

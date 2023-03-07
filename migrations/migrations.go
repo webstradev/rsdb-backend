@@ -3,7 +3,7 @@ package migrations
 func LoadMigrations() *Sqlx {
 	return &Sqlx{
 		Migrations: []SqlxMigration{
-			// // Initial Tables
+			// Initial Tables
 			SqlxFileMigration("create_platforms", "migrations/create_platforms.sql", "migrations/create_platforms.undo.sql"),
 			SqlxFileMigration("create_articles", "migrations/create_articles.sql", "migrations/create_articles.undo.sql"),
 			SqlxFileMigration("create_categories", "migrations/create_categories.sql", "migrations/create_categories.undo.sql"),
@@ -17,8 +17,11 @@ func LoadMigrations() *Sqlx {
 			SqlxFileMigration("create_articles_tags", "migrations/create_articles_tags.sql", "migrations/create_articles_tags.undo.sql"),
 			SqlxFileMigration("create_projects_tags", "migrations/create_projects_tags.sql", "migrations/create_projects_tags.undo.sql"),
 
-			// // Categories
+			// Categories
 			SqlxFileMigration("insert_categories", "migrations/insert_categories.sql", "migrations/insert_categories.undo.sql"),
+
+			// User Tokens
+			SqlxFileMigration("create_users_tokens", "migrations/create_users_tokens.sql", "migrations/create_users_tokens.undo.sql"),
 		},
 	}
 }

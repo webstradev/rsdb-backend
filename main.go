@@ -17,6 +17,7 @@ import (
 	"github.com/webstradev/rsdb-backend/controllers/articles"
 	"github.com/webstradev/rsdb-backend/controllers/platforms"
 	"github.com/webstradev/rsdb-backend/controllers/projects"
+	"github.com/webstradev/rsdb-backend/controllers/users"
 	"github.com/webstradev/rsdb-backend/db"
 	"github.com/webstradev/rsdb-backend/middlewares"
 	"github.com/webstradev/rsdb-backend/migrations"
@@ -47,10 +48,13 @@ func main() {
 		log.Fatal(err)
 	}
 
+	uuidService := auth.NewUUIDService()
+
 	// Initialize Environment (for dependency injection)
 	env := &utils.Environment{
-		DB:  db,
-		JWT: jwtService,
+		DB:   db,
+		JWT:  jwtService,
+		UUID: uuidService,
 	}
 
 	// Initialise router
@@ -67,7 +71,7 @@ func main() {
 		c.Status(http.StatusOK)
 	})
 
-	router.POST("/api/v1/login", controllers.Login(env))
+	router.POST("/api/v1/login", users.Login(env))
 
 	// All the calls to the api group will require authentication
 	api := router.Group("/api/v1")
@@ -106,6 +110,9 @@ func main() {
 	// Admin Routes
 	admin := api.Group("/admin")
 	admin.Use(middlewares.AdminAuthMiddleware())
+
+	// Users
+	admin.GET("/users/token", users.GetRegistrationToken(env))
 
 	// Server object
 	s := &http.Server{
