@@ -12,9 +12,10 @@ import (
 )
 
 type Environment struct {
-	DB   *db.Database
-	JWT  auth.JWTServicer
-	UUID auth.UUIDGenerator
+	DB          *db.Database
+	JWT         auth.JWTServicer
+	UUID        auth.UUIDGenerator
+	AuthService auth.AuthServicer
 }
 
 func SetupTestEnvironment(MockDbCall func(sqlmock.Sqlmock)) (*gin.Engine, *sql.DB, sqlmock.Sqlmock, *Environment, error) {

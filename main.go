@@ -48,13 +48,12 @@ func main() {
 		log.Fatal(err)
 	}
 
-	uuidService := auth.NewUUIDService()
-
 	// Initialize Environment (for dependency injection)
 	env := &utils.Environment{
-		DB:   db,
-		JWT:  jwtService,
-		UUID: uuidService,
+		DB:          db,
+		JWT:         jwtService,
+		UUID:        auth.NewUUIDService(),
+		AuthService: auth.NewAuthService(),
 	}
 
 	// Initialise router
@@ -71,7 +70,9 @@ func main() {
 		c.Status(http.StatusOK)
 	})
 
+	// Users
 	router.POST("/api/v1/login", users.Login(env))
+	router.POST("api/v1/users/register", users.Register(env))
 
 	// All the calls to the api group will require authentication
 	api := router.Group("/api/v1")
@@ -111,7 +112,7 @@ func main() {
 	admin := api.Group("/admin")
 	admin.Use(middlewares.AdminAuthMiddleware())
 
-	// Users
+	// Users (admin)
 	admin.GET("/users/token", users.GetRegistrationToken(env))
 
 	// Server object

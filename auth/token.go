@@ -10,6 +10,7 @@ import (
 
 const (
 	AdminRole = "admin"
+	UserRole  = "user"
 )
 
 type JWTServicer interface {
