@@ -70,7 +70,7 @@ func main() {
 		c.Status(http.StatusOK)
 	})
 
-	// Users
+	// Users (unauthenticated)
 	router.POST("/api/v1/login", users.Login(env))
 	router.POST("api/v1/users/register", users.Register(env))
 
@@ -107,6 +107,9 @@ func main() {
 	api.GET("/projects/:projectId", projects.GetProject(env))
 	api.PUT("/projects/:projectId", projects.EditProject(env))
 	api.DELETE("/projects/:projectId", projects.DeleteProject(env))
+
+	// Users (authenticated)
+	api.PUT("/users/password", users.EditPassword(env))
 
 	// Admin Routes
 	admin := api.Group("/admin")

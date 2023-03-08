@@ -23,3 +23,8 @@ func (db *Database) InsertUser(u User) error {
 	_, err := db.querier.NamedExec("INSERT INTO users (email, password, role) VALUES (:email, :password, :role)", u)
 	return err
 }
+
+func (db *Database) UpdatePasswordForUser(userId int64, hashedPassword string) error {
+	_, err := db.querier.Exec("UPDATE users SET password = ? WHERE id = ?", hashedPassword, userId)
+	return err
+}

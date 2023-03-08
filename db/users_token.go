@@ -30,10 +30,6 @@ func (db *Database) InsertPasswordResetToken(hashedToken string, userId, created
 }
 
 func (db *Database) ValidateRegistrationToken(hashedToken string) (bool, error) {
-	return db.validateToken(hashedToken, REGISTRATION_TYPE)
-}
-
-func (db *Database) validateToken(hashedToken, tokenType string) (bool, error) {
 	var count int64
 	// Make sure there is an unused token with the given hash and type that is not expired
 	err := db.querier.Get(&count, `
@@ -46,7 +42,25 @@ func (db *Database) validateToken(hashedToken, tokenType string) (bool, error) {
 		type = ? AND 
 		used = 0 AND 
 		created_at > ?
-	`, hashedToken, tokenType, time.Now().Add(-REGISTRATION_TOKEN_EXPIRY))
+	`, hashedToken, REGISTRATION_TYPE, time.Now().Add(-REGISTRATION_TOKEN_EXPIRY))
+	return count > 0, err
+}
+
+func (db *Database) ValidatePasswordResetToken(hashedToken string, userId int64) (bool, error) {
+	var count int64
+	// Make sure there is an unused token with the given hash and type that is not expired
+	err := db.querier.Get(&count, `
+	SELECT 
+		COUNT(*) 
+	FROM 
+		users_tokens 
+	WHERE 
+		hashed_token = ? AND 
+		type = ? AND 
+		used = 0 AND 
+		user_id = ? AND
+		created_at > ?
+	`, hashedToken, PASSWORD_RESET_TYPE, userId, time.Now().Add(-REGISTRATION_TOKEN_EXPIRY))
 	return count > 0, err
 }
 
