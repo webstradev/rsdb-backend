@@ -114,6 +114,7 @@ func main() {
 
 	// Users (admin)
 	admin.GET("/users/token", users.GetRegistrationToken(env))
+	admin.GET("/users/:userId/resettoken", users.GetPasswordResetToken(env))
 
 	// Server object
 	s := &http.Server{

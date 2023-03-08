@@ -7,6 +7,7 @@ import (
 const (
 	REGISTRATION_TYPE         = "REGISTRATION"
 	REGISTRATION_TOKEN_EXPIRY = 24 * time.Hour
+	PASSWORD_RESET_TYPE       = "PASSWORD_RESET"
 )
 
 type UsersToken struct {
@@ -20,6 +21,11 @@ type UsersToken struct {
 
 func (db *Database) InsertRegistrationToken(hashedToken string, createdBy int64) error {
 	_, err := db.querier.Exec("INSERT INTO users_tokens (hashed_token, type, created_by) VALUES (?, ?, ?)", hashedToken, REGISTRATION_TYPE, createdBy)
+	return err
+}
+
+func (db *Database) InsertPasswordResetToken(hashedToken string, userId, createdBy int64) error {
+	_, err := db.querier.Exec("INSERT INTO users_tokens (hashed_token, type, user_id, created_by) VALUES (?, ?, ?, ?)", hashedToken, PASSWORD_RESET_TYPE, userId, createdBy)
 	return err
 }
 
