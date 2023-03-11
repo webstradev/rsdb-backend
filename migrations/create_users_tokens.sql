@@ -10,8 +10,8 @@ CREATE TABLE `users_tokens` (
 	PRIMARY KEY (`hashed_token`) USING BTREE,
 	INDEX `FK_users_tokens_users` (`created_by`) USING BTREE,
 	INDEX `FK_userid_users` (`user_id`) USING BTREE,
-	CONSTRAINT `FK_userid_users` FOREIGN KEY (`user_id`) REFERENCES `rsdb`.`users` (`id`) ON UPDATE CASCADE ON DELETE SET NULL,
-	CONSTRAINT `FK_users_tokens_users` FOREIGN KEY (`created_by`) REFERENCES `rsdb`.`users` (`id`) ON UPDATE CASCADE ON DELETE SET NULL
+	CONSTRAINT `FK_userid_users` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON UPDATE CASCADE ON DELETE SET NULL,
+	CONSTRAINT `FK_users_tokens_users` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON UPDATE CASCADE ON DELETE SET NULL
 )
 COLLATE='utf8mb4_bin'
 ENGINE=InnoDB
