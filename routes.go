@@ -2,7 +2,9 @@ package main
 
 import (
 	"net/http"
+	"time"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/webstradev/rsdb-backend/controllers"
 	"github.com/webstradev/rsdb-backend/controllers/articles"
@@ -22,6 +24,15 @@ func registerRoutes(env *utils.Environment) *gin.Engine {
 
 	// Use the logger and recovery middleware
 	router.Use(logger, gin.Recovery())
+
+	// CORS Setup
+	router.Use(cors.New(cors.Config{
+		AllowOrigins:  []string{"localhost", "https://dev.rsdb.webstra.dev", "https://rsdb.webstra.dev"},
+		AllowMethods:  []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
+		AllowHeaders:  []string{"*"},
+		ExposeHeaders: []string{"*"},
+		MaxAge:        12 * time.Hour,
+	}))
 
 	// Health check for k8s
 	router.GET("/api/health", func(c *gin.Context) {
