@@ -27,7 +27,7 @@ func registerRoutes(env *utils.Environment) *gin.Engine {
 
 	// CORS Setup
 	router.Use(cors.New(cors.Config{
-		AllowOrigins:  []string{"localhost", "https://dev.rsdb.webstra.dev", "https://rsdb.webstra.dev"},
+		AllowOrigins:  []string{"http://localhost:5173", "https://dev.rsdb.webstra.dev", "https://rsdb.webstra.dev"},
 		AllowMethods:  []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		AllowHeaders:  []string{"*"},
 		ExposeHeaders: []string{"*"},
