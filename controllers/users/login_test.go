@@ -1,6 +1,7 @@
 package users
 
 import (
+	"database/sql"
 	"errors"
 	"io"
 	"net/http"
@@ -16,6 +17,17 @@ import (
 )
 
 func TestLogin(t *testing.T) {
+	// This timestamp is to mock date values returned by the database
+	timestamp, err := time.Parse("2006-01-02 15:04:05", "2023-01-01 00:00:00")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	sqlTimestamp := sql.NullTime{
+		Time:  timestamp,
+		Valid: false,
+	}
+
 	tests := []struct {
 		Name       string
 		MockDbCall func(sqlmock.Sqlmock)
@@ -56,10 +68,8 @@ func TestLogin(t *testing.T) {
 				}
 				hashedPassword := string(hashBytes)
 
-				now := time.Now()
-
 				rows := sqlmock.NewRows([]string{"id", "created_at", "modified_at", "deleted_at", "email", "password", "role"}).
-					AddRow(1, now, now, nil, "test", hashedPassword, "user")
+					AddRow(1, timestamp, timestamp, sqlTimestamp, "test", hashedPassword, "user")
 				mock.ExpectQuery("SELECT (.+) FROM users").WillReturnRows(rows)
 
 			},
@@ -68,7 +78,7 @@ func TestLogin(t *testing.T) {
 			`{}`,
 		},
 		{
-			"Login - Successfull login",
+			"Login - Successfull login but an error on the jwt creation",
 			func(mock sqlmock.Sqlmock) {
 				// Hash a fake password for testing
 				hashBytes, err := bcrypt.GenerateFromPassword([]byte("test"), bcrypt.DefaultCost)
@@ -77,11 +87,9 @@ func TestLogin(t *testing.T) {
 				}
 				hashedPassword := string(hashBytes)
 
-				now := time.Now()
-
 				rows := sqlmock.NewRows([]string{"id", "created_at", "modified_at", "deleted_at", "email", "password", "role"}).
 					// Userid 0 will force the mock jwt service to return an error
-					AddRow(0, now, now, nil, "test", hashedPassword, "user")
+					AddRow(0, timestamp, timestamp, sqlTimestamp, "test", hashedPassword, "user")
 				mock.ExpectQuery("SELECT (.+) FROM users").WillReturnRows(rows)
 
 			},
@@ -99,16 +107,14 @@ func TestLogin(t *testing.T) {
 				}
 				hashedPassword := string(hashBytes)
 
-				now := time.Now()
-
 				rows := sqlmock.NewRows([]string{"id", "created_at", "modified_at", "deleted_at", "email", "password", "role"}).
-					AddRow(1, now, now, nil, "test", hashedPassword, "user")
+					AddRow(1, timestamp, timestamp, sqlTimestamp, "test", hashedPassword, "user")
 				mock.ExpectQuery("SELECT (.+) FROM users").WillReturnRows(rows)
 
 			},
 			http.StatusOK,
 			`{"email": "test", "password": "test"}`,
-			`{"token":"usertoken"}`,
+			`{"token":"usertoken","user":{"id":1,"createdAt":"2023-01-01T00:00:00Z","modifiedAt":"2023-01-01T00:00:00Z","deletedAt":{"Valid":false,"Time":"0001-01-01T00:00:00Z"},"role":"user","email":"test"}}`,
 		},
 	}
 

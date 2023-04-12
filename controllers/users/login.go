@@ -43,6 +43,9 @@ func Login(env *utils.Environment) gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, gin.H{"token": token})
+		c.JSON(http.StatusOK, gin.H{
+			"token": token,
+			"user":  user,
+		})
 	}
 }
