@@ -18,6 +18,12 @@ func GetArticles(env *utils.Environment) gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, articles)
+		count, err := env.DB.CountArticles()
+		if err != nil {
+			c.AbortWithStatus(http.StatusInternalServerError)
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{"total": count, "articles": articles})
 	}
 }

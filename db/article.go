@@ -94,7 +94,7 @@ func (db *Database) GetArticles(page, pageSize int) ([]ArticleWithTagString, err
 		tags t ON t.id = at.tag_id
 	WHERE a.deleted_at IS NULL
 	GROUP BY a.id
-	LIMIT ? OFFSET ?`, pageSize, (page-1)*pageSize)
+	LIMIT ? OFFSET ?`, pageSize, (page)*pageSize)
 	if err != nil {
 		log.Println(err)
 		return nil, err
