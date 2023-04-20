@@ -1,6 +1,7 @@
 package articles
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 	"io"
@@ -46,8 +47,8 @@ func TestGetArticles(t *testing.T) {
 			2,
 			func(mock sqlmock.Sqlmock) {
 				rows := sqlmock.NewRows([]string{"id", "title", "description", "link", "date", "body"}).
-					AddRow(1, "test", "test", "test", timestamp, "test").
-					AddRow(2, "test", "test", "test", timestamp, "test")
+					AddRow(1, "test", "test", "test", sql.NullTime{Valid: true, Time: timestamp}, "test").
+					AddRow(2, "test", "test", "test", sql.NullTime{Valid: true, Time: timestamp}, "test")
 				mock.ExpectQuery("SELECT a.(.+) FROM articles").WithArgs(2, 0).WillReturnRows(rows)
 
 				mock.ExpectQuery("SELECT COUNT(.+) AS count FROM articles").WillReturnError(errors.New("test"))
@@ -61,15 +62,15 @@ func TestGetArticles(t *testing.T) {
 			2,
 			func(mock sqlmock.Sqlmock) {
 				rows := sqlmock.NewRows([]string{"id", "title", "description", "link", "date", "body"}).
-					AddRow(1, "test", "test", "test", timestamp, "test").
-					AddRow(2, "test", "test", "test", timestamp, "test")
+					AddRow(1, "test", "test", "test", sql.NullTime{Valid: true, Time: timestamp}, "test").
+					AddRow(2, "test", "test", "test", sql.NullTime{Valid: true, Time: timestamp}, "test")
 				mock.ExpectQuery("SELECT a.(.+) FROM articles").WithArgs(2, 0).WillReturnRows(rows)
 
 				rows = sqlmock.NewRows([]string{"id"}).AddRow(10)
 				mock.ExpectQuery("SELECT COUNT(.+) AS count FROM articles").WillReturnRows(rows)
 			},
 			http.StatusOK,
-			`{"total":10,"articles":[{"id":1,"createdAt":"0001-01-01T00:00:00Z","modifiedAt":"0001-01-01T00:00:00Z","deletedAt":{"Time":"0001-01-01T00:00:00Z","Valid":false},"title":"test","description":"test","link":"test","date":"2023-01-01T00:00:00Z","body":"test","platforms":null,"tags":null,"tagString":""},{"id":2,"createdAt":"0001-01-01T00:00:00Z","modifiedAt":"0001-01-01T00:00:00Z","deletedAt":{"Time":"0001-01-01T00:00:00Z","Valid":false},"title":"test","description":"test","link":"test","date":"2023-01-01T00:00:00Z","body":"test","platforms":null,"tags":null,"tagString":""}]}`,
+			`{"total":10,"articles":[{"id":1,"createdAt":"0001-01-01T00:00:00Z","modifiedAt":"0001-01-01T00:00:00Z","deletedAt":{"Time":"0001-01-01T00:00:00Z","Valid":false},"title":"test","description":"test","link":"test","date":{"Time":"2023-01-01T00:00:00Z","Valid":true},"body":"test","platforms":null,"tags":null,"tagString":""},{"id":2,"createdAt":"0001-01-01T00:00:00Z","modifiedAt":"0001-01-01T00:00:00Z","deletedAt":{"Time":"0001-01-01T00:00:00Z","Valid":false},"title":"test","description":"test","link":"test","date":{"Time":"2023-01-01T00:00:00Z","Valid":true},"body":"test","platforms":null,"tags":null,"tagString":""}]}`,
 		},
 		{
 			"GetArticles - 4 articles from page 2",
@@ -77,17 +78,17 @@ func TestGetArticles(t *testing.T) {
 			4,
 			func(mock sqlmock.Sqlmock) {
 				rows := sqlmock.NewRows([]string{"id", "title", "description", "link", "date", "body"}).
-					AddRow(3, "test", "test", "test", timestamp, "test").
-					AddRow(4, "test", "test", "test", timestamp, "test").
-					AddRow(5, "test", "test", "test", timestamp, "test").
-					AddRow(6, "test", "test", "test", timestamp, "test")
+					AddRow(3, "test", "test", "test", sql.NullTime{Valid: true, Time: timestamp}, "test").
+					AddRow(4, "test", "test", "test", sql.NullTime{Valid: true, Time: timestamp}, "test").
+					AddRow(5, "test", "test", "test", sql.NullTime{Valid: true, Time: timestamp}, "test").
+					AddRow(6, "test", "test", "test", sql.NullTime{Valid: true, Time: timestamp}, "test")
 				mock.ExpectQuery("SELECT a.(.+) FROM articles").WithArgs(4, 4).WillReturnRows(rows)
 
 				rows = sqlmock.NewRows([]string{"id"}).AddRow(10)
 				mock.ExpectQuery("SELECT COUNT(.+) AS count FROM articles").WillReturnRows(rows)
 			},
 			http.StatusOK,
-			`{"total":10,"articles":[{"id":3,"createdAt":"0001-01-01T00:00:00Z","modifiedAt":"0001-01-01T00:00:00Z","deletedAt":{"Time":"0001-01-01T00:00:00Z","Valid":false},"title":"test","description":"test","link":"test","date":"2023-01-01T00:00:00Z","body":"test","platforms":null,"tags":null,"tagString":""},{"id":4,"createdAt":"0001-01-01T00:00:00Z","modifiedAt":"0001-01-01T00:00:00Z","deletedAt":{"Time":"0001-01-01T00:00:00Z","Valid":false},"title":"test","description":"test","link":"test","date":"2023-01-01T00:00:00Z","body":"test","platforms":null,"tags":null,"tagString":""},{"id":5,"createdAt":"0001-01-01T00:00:00Z","modifiedAt":"0001-01-01T00:00:00Z","deletedAt":{"Time":"0001-01-01T00:00:00Z","Valid":false},"title":"test","description":"test","link":"test","date":"2023-01-01T00:00:00Z","body":"test","platforms":null,"tags":null,"tagString":""},{"id":6,"createdAt":"0001-01-01T00:00:00Z","modifiedAt":"0001-01-01T00:00:00Z","deletedAt":{"Time":"0001-01-01T00:00:00Z","Valid":false},"title":"test","description":"test","link":"test","date":"2023-01-01T00:00:00Z","body":"test","platforms":null,"tags":null,"tagString":""}]}`,
+			`{"total":10,"articles":[{"id":3,"createdAt":"0001-01-01T00:00:00Z","modifiedAt":"0001-01-01T00:00:00Z","deletedAt":{"Time":"0001-01-01T00:00:00Z","Valid":false},"title":"test","description":"test","link":"test","date":{"Time":"2023-01-01T00:00:00Z","Valid":true},"body":"test","platforms":null,"tags":null,"tagString":""},{"id":4,"createdAt":"0001-01-01T00:00:00Z","modifiedAt":"0001-01-01T00:00:00Z","deletedAt":{"Time":"0001-01-01T00:00:00Z","Valid":false},"title":"test","description":"test","link":"test","date":{"Time":"2023-01-01T00:00:00Z","Valid":true},"body":"test","platforms":null,"tags":null,"tagString":""},{"id":5,"createdAt":"0001-01-01T00:00:00Z","modifiedAt":"0001-01-01T00:00:00Z","deletedAt":{"Time":"0001-01-01T00:00:00Z","Valid":false},"title":"test","description":"test","link":"test","date":{"Time":"2023-01-01T00:00:00Z","Valid":true},"body":"test","platforms":null,"tags":null,"tagString":""},{"id":6,"createdAt":"0001-01-01T00:00:00Z","modifiedAt":"0001-01-01T00:00:00Z","deletedAt":{"Time":"0001-01-01T00:00:00Z","Valid":false},"title":"test","description":"test","link":"test","date":{"Time":"2023-01-01T00:00:00Z","Valid":true},"body":"test","platforms":null,"tags":null,"tagString":""}]}`,
 		},
 	}
 

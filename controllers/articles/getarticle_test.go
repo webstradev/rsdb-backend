@@ -59,7 +59,7 @@ func TestGetArticle(t *testing.T) {
 			"1",
 			func(mock sqlmock.Sqlmock) {
 				rows := sqlmock.NewRows([]string{"id", "title", "description", "link", "date", "body"}).
-					AddRow(1, "test", "test", "test", timestamp, "test")
+					AddRow(1, "test", "test", "test", sql.NullTime{Valid: true, Time: timestamp}, "test")
 				mock.ExpectQuery("SELECT a.(.+)").WithArgs(1).WillReturnRows(rows)
 
 				mock.ExpectQuery("SELECT at.(.+)").WithArgs(1).WillReturnError(errors.New("test"))
@@ -72,7 +72,7 @@ func TestGetArticle(t *testing.T) {
 			"1",
 			func(mock sqlmock.Sqlmock) {
 				rows := sqlmock.NewRows([]string{"id", "title", "description", "link", "date", "body"}).
-					AddRow(1, "test", "test", "test", timestamp, "test")
+					AddRow(1, "test", "test", "test", sql.NullTime{Valid: true, Time: timestamp}, "test")
 				mock.ExpectQuery("SELECT a.(.+)").WithArgs(1).WillReturnRows(rows)
 
 				rows = sqlmock.NewRows([]string{"article_id", "tag_id", "tag"}).
@@ -89,7 +89,7 @@ func TestGetArticle(t *testing.T) {
 			"1",
 			func(mock sqlmock.Sqlmock) {
 				rows := sqlmock.NewRows([]string{"id", "title", "description", "link", "date", "body"}).
-					AddRow(1, "test", "test", "test", timestamp, "test")
+					AddRow(1, "test", "test", "test", sql.NullTime{Valid: true, Time: timestamp}, "test")
 				mock.ExpectQuery("SELECT a.(.+)").WithArgs(1).WillReturnRows(rows)
 
 				rows = sqlmock.NewRows([]string{"article_id", "tag_id", "tag"}).
@@ -101,7 +101,7 @@ func TestGetArticle(t *testing.T) {
 				mock.ExpectQuery("SELECT pa.(.+)").WithArgs(1).WillReturnRows(rows)
 			},
 			http.StatusOK,
-			`{"id":1,"createdAt":"0001-01-01T00:00:00Z","modifiedAt":"0001-01-01T00:00:00Z","deletedAt":{"Time":"0001-01-01T00:00:00Z","Valid":false},"title":"test","description":"test","link":"test","date":"2023-01-01T00:00:00Z","body":"test","tags":[{"id":1,"tag":"test"}],"platforms":[{"id":1,"platform":"test"}]}`,
+			`{"id":1,"createdAt":"0001-01-01T00:00:00Z","modifiedAt":"0001-01-01T00:00:00Z","deletedAt":{"Time":"0001-01-01T00:00:00Z","Valid":false},"title":"test","description":"test","link":"test","date":{"Time":"2023-01-01T00:00:00Z","Valid":true},"body":"test","tags":[{"id":1,"tag":"test"}],"platforms":[{"id":1,"platform":"test"}]}`,
 		},
 	}
 

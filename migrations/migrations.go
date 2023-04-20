@@ -22,6 +22,11 @@ func LoadMigrations() *Sqlx {
 
 			// User Tokens
 			SqlxFileMigration("create_users_tokens", "migrations/create_users_tokens.sql", "migrations/create_users_tokens.undo.sql"),
+
+			// Allow null dates on articles
+			SqlxFileMigration("alter_articles_table", "migrations/alter_articles_table.sql", "migrations/alter_articles_table.undo.sql"),
+			// Set 0000-00-00 to null
+			SqlxFileMigration("set_articles_date_null", "migrations/set_articles_date_null.sql", "migrations/set_articles_date_null.undo.sql"),
 		},
 	}
 }

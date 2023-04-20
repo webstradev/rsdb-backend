@@ -1,9 +1,9 @@
 package db
 
 import (
+	"database/sql"
 	"log"
 	"strings"
-	"time"
 
 	"github.com/jmoiron/sqlx"
 )
@@ -13,7 +13,7 @@ type Article struct {
 	Title       string            `json:"title" db:"title"`
 	Description string            `json:"description" db:"description"`
 	Link        string            `json:"link" db:"link"`
-	Date        time.Time         `json:"date" db:"date"`
+	Date        sql.NullTime      `json:"date" db:"date"`
 	Body        string            `json:"body" db:"body"`
 	Tags        []ArticleTag      `json:"tags"`
 	Platforms   []ArticlePlatform `json:"platforms"`

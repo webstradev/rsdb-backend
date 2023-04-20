@@ -48,7 +48,7 @@ func TestEditArticle(t *testing.T) {
 				mock.ExpectRollback()
 			},
 			http.StatusInternalServerError,
-			`{"title":"test","description":"test","link":"test","date":"2023-03-05T00:00:00Z","body":"test"}`,
+			`{"title":"test","description":"test","link":"test","date":{"Time":"2023-03-05T00:00:00Z","Valid":true},"body":"test"}`,
 			`{}`,
 		},
 		{
@@ -64,7 +64,7 @@ func TestEditArticle(t *testing.T) {
 				mock.ExpectCommit()
 			},
 			http.StatusOK,
-			`{"title":"test","description":"test","link":"test","date":"2023-03-05T00:00:00Z","body":"test","tags":[{"id":1,"tag":"test"}],"platforms":[{"id":1,"platform":"test"}]}`,
+			`{"title":"test","description":"test","link":"test","date":{"Time":"2023-03-05T00:00:00Z","Valid":true},"body":"test","tags":[{"id":1,"tag":"test"}],"platforms":[{"id":1,"platform":"test"}]}`,
 			`{}`,
 		},
 	}

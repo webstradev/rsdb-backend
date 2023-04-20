@@ -1,0 +1,1 @@
+UPDATE articles SET `date` = NULL WHERE `date` = 0000-00-00

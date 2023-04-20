@@ -34,7 +34,7 @@ func TestCreateArticle(t *testing.T) {
 				mock.ExpectExec("INSERT INTO articles").WillReturnError(errors.New("test"))
 			},
 			http.StatusInternalServerError,
-			`{"article":{"title":"test","description":"test","link":"test","date":"2023-03-05T00:00:00Z","body":"test"},"linkedPlatforms":[1,2,3],"tags":[1,2]}`,
+			`{"article":{"title":"test","description":"test","link":"test","date":{"Time":"2023-03-05T00:00:00Z","Valid":true},"body":"test"},"linkedPlatforms":[1,2,3],"tags":[1,2]}`,
 			`{}`,
 		},
 		{
@@ -44,7 +44,7 @@ func TestCreateArticle(t *testing.T) {
 				mock.ExpectExec("INSERT INTO platforms_articles").WillReturnError(errors.New("test"))
 			},
 			http.StatusInternalServerError,
-			`{"article":{"title":"test","description":"test","link":"test","date":"2023-03-05T00:00:00Z","body":"test"},"linkedPlatforms":[1,2,3],"tags":[1,2]}`,
+			`{"article":{"title":"test","description":"test","link":"test","date":{"Time":"2023-03-05T00:00:00Z","Valid":true},"body":"test"},"linkedPlatforms":[1,2,3],"tags":[1,2]}`,
 			`{}`,
 		},
 		{
@@ -54,7 +54,7 @@ func TestCreateArticle(t *testing.T) {
 				mock.ExpectExec("INSERT INTO articles_tags").WillReturnError(errors.New("test"))
 			},
 			http.StatusInternalServerError,
-			`{"article":{"title":"test","description":"test","link":"test","date":"2023-03-05T00:00:00Z","body":"test"},"tags":[1,2]}`,
+			`{"article":{"title":"test","description":"test","link":"test","date":{"Time":"2023-03-05T00:00:00Z","Valid":true},"body":"test"},"tags":[1,2]}`,
 			`{}`,
 		},
 		{
@@ -65,7 +65,7 @@ func TestCreateArticle(t *testing.T) {
 				mock.ExpectExec("INSERT INTO articles_tags").WillReturnResult(sqlmock.NewResult(1, 1))
 			},
 			http.StatusOK,
-			`{"article":{"title":"test","description":"test","link":"test","date":"2023-03-05T00:00:00Z","body":"test"},"linkedPlatforms":[1,2,3],"tags":[1,2]}`,
+			`{"article":{"title":"test","description":"test","link":"test","date":{"Time":"2023-03-05T00:00:00Z","Valid":true},"body":"test"},"linkedPlatforms":[1,2,3],"tags":[1,2]}`,
 			`{"message":"Article created successfully"}`,
 		},
 	}
