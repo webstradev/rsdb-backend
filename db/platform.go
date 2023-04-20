@@ -60,7 +60,7 @@ func (db *Database) GetPlatforms(page, pageSize int) ([]PlatformWithCategoryStri
 		categories ca ON ca.id = pc.category_id
 	WHERE p.deleted_at IS NULL
 	GROUP BY p.id
-	LIMIT ? OFFSET ?`, pageSize, (page-1)*pageSize)
+	LIMIT ? OFFSET ?`, pageSize, (page)*pageSize)
 	if err != nil {
 		log.Println(err)
 		return nil, err

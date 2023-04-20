@@ -1,6 +1,8 @@
 package platforms
 
 import (
+	"log"
+	"math"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -18,6 +20,13 @@ func GetPlatforms(env *utils.Environment) gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, platforms)
+		count, err := env.DB.CountPlatforms()
+		if err != nil {
+			log.Println(err)
+			c.AbortWithStatus(http.StatusInternalServerError)
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{"platforms": platforms, "total": count, "numPages": math.Ceil(float64(count) / float64(pageSize))})
 	}
 }
