@@ -18,6 +18,12 @@ func GetProjects(env *utils.Environment) gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, projects)
+		count, err := env.DB.CountProjects()
+		if err != nil {
+			c.AbortWithStatus(http.StatusInternalServerError)
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{"total": count, "projects": projects})
 	}
 }

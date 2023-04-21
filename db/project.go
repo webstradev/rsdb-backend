@@ -94,7 +94,7 @@ func (db *Database) GetProjects(page, pageSize int) ([]ProjectWithTagString, err
 		tags t ON t.id = pt.tag_id
 	WHERE p.deleted_at IS NULL
 	GROUP BY p.id
-	LIMIT ? OFFSET ?`, pageSize, (page-1)*pageSize)
+	LIMIT ? OFFSET ?`, pageSize, (page)*pageSize)
 	if err != nil {
 		log.Println(err)
 		return nil, err

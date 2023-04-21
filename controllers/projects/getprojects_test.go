@@ -38,7 +38,7 @@ func TestGetProjects(t *testing.T) {
 	}{
 		{
 			"GetProjects - sql error - GetProjects",
-			1,
+			0,
 			10,
 			func(mock sqlmock.Sqlmock) {
 				mock.ExpectQuery("SELECT p.(.+) FROM projects").WithArgs(10, 0).WillReturnError(errors.New("test"))
@@ -47,21 +47,39 @@ func TestGetProjects(t *testing.T) {
 			`{}`,
 		},
 		{
-			"GetProjects - 2 projects from page 1",
-			1,
+			"GetProjects - sql error - CountProjects",
+			0,
 			2,
 			func(mock sqlmock.Sqlmock) {
 				rows := sqlmock.NewRows([]string{"id", "title", "description", "link", "date", "body"}).
 					AddRow(1, "test", "test", "test", sqlTimestamp, "test").
 					AddRow(2, "test", "test", "test", sqlTimestamp, "test")
 				mock.ExpectQuery("SELECT p.(.+) FROM projects").WithArgs(2, 0).WillReturnRows(rows)
+
+				mock.ExpectQuery("SELECT COUNT(.+) AS count FROM projects").WillReturnError(errors.New("test"))
+			},
+			http.StatusInternalServerError,
+			`{}`,
+		},
+		{
+			"GetProjects - 2 projects from page 1",
+			0,
+			2,
+			func(mock sqlmock.Sqlmock) {
+				rows := sqlmock.NewRows([]string{"id", "title", "description", "link", "date", "body"}).
+					AddRow(1, "test", "test", "test", sqlTimestamp, "test").
+					AddRow(2, "test", "test", "test", sqlTimestamp, "test")
+				mock.ExpectQuery("SELECT p.(.+) FROM projects").WithArgs(2, 0).WillReturnRows(rows)
+
+				rows = sqlmock.NewRows([]string{"count"}).AddRow(10)
+				mock.ExpectQuery("SELECT COUNT(.+) AS count FROM projects").WillReturnRows(rows)
 			},
 			http.StatusOK,
-			`[{"id":1,"createdAt":"0001-01-01T00:00:00Z","modifiedAt":"0001-01-01T00:00:00Z","deletedAt":{"Time":"0001-01-01T00:00:00Z","Valid":false},"title":"test","description":"test","link":"test","date":{"Time":"2023-01-01T00:00:00Z","Valid":true},"body":"test","platforms":null,"tags":null,"tagString":""},{"id":2,"createdAt":"0001-01-01T00:00:00Z","modifiedAt":"0001-01-01T00:00:00Z","deletedAt":{"Time":"0001-01-01T00:00:00Z","Valid":false},"title":"test","description":"test","link":"test","date":{"Time":"2023-01-01T00:00:00Z","Valid":true},"body":"test","platforms":null,"tags":null,"tagString":""}]`,
+			`{"total":10,"projects":[{"id":1,"createdAt":"0001-01-01T00:00:00Z","modifiedAt":"0001-01-01T00:00:00Z","deletedAt":{"Time":"0001-01-01T00:00:00Z","Valid":false},"title":"test","description":"test","link":"test","date":{"Time":"2023-01-01T00:00:00Z","Valid":true},"body":"test","platforms":null,"tags":null,"tagString":""},{"id":2,"createdAt":"0001-01-01T00:00:00Z","modifiedAt":"0001-01-01T00:00:00Z","deletedAt":{"Time":"0001-01-01T00:00:00Z","Valid":false},"title":"test","description":"test","link":"test","date":{"Time":"2023-01-01T00:00:00Z","Valid":true},"body":"test","platforms":null,"tags":null,"tagString":""}]}`,
 		},
 		{
 			"GetProjects - 4 projects from page 2",
-			2,
+			1,
 			4,
 			func(mock sqlmock.Sqlmock) {
 				rows := sqlmock.NewRows([]string{"id", "title", "description", "link", "date", "body"}).
@@ -70,9 +88,12 @@ func TestGetProjects(t *testing.T) {
 					AddRow(5, "test", "test", "test", sqlTimestamp, "test").
 					AddRow(6, "test", "test", "test", sqlTimestamp, "test")
 				mock.ExpectQuery("SELECT p.(.+) FROM projects").WithArgs(4, 4).WillReturnRows(rows)
+
+				rows = sqlmock.NewRows([]string{"count"}).AddRow(10)
+				mock.ExpectQuery("SELECT COUNT(.+) AS count FROM projects").WillReturnRows(rows)
 			},
 			http.StatusOK,
-			`[{"id":3,"createdAt":"0001-01-01T00:00:00Z","modifiedAt":"0001-01-01T00:00:00Z","deletedAt":{"Time":"0001-01-01T00:00:00Z","Valid":false},"title":"test","description":"test","link":"test","date":{"Time":"2023-01-01T00:00:00Z","Valid":true},"body":"test","platforms":null,"tags":null,"tagString":""},{"id":4,"createdAt":"0001-01-01T00:00:00Z","modifiedAt":"0001-01-01T00:00:00Z","deletedAt":{"Time":"0001-01-01T00:00:00Z","Valid":false},"title":"test","description":"test","link":"test","date":{"Time":"2023-01-01T00:00:00Z","Valid":true},"body":"test","platforms":null,"tags":null,"tagString":""},{"id":5,"createdAt":"0001-01-01T00:00:00Z","modifiedAt":"0001-01-01T00:00:00Z","deletedAt":{"Time":"0001-01-01T00:00:00Z","Valid":false},"title":"test","description":"test","link":"test","date":{"Time":"2023-01-01T00:00:00Z","Valid":true},"body":"test","platforms":null,"tags":null,"tagString":""},{"id":6,"createdAt":"0001-01-01T00:00:00Z","modifiedAt":"0001-01-01T00:00:00Z","deletedAt":{"Time":"0001-01-01T00:00:00Z","Valid":false},"title":"test","description":"test","link":"test","date":{"Time":"2023-01-01T00:00:00Z","Valid":true},"body":"test","platforms":null,"tags":null,"tagString":""}]`,
+			`{"total":10,"projects":[{"id":3,"createdAt":"0001-01-01T00:00:00Z","modifiedAt":"0001-01-01T00:00:00Z","deletedAt":{"Time":"0001-01-01T00:00:00Z","Valid":false},"title":"test","description":"test","link":"test","date":{"Time":"2023-01-01T00:00:00Z","Valid":true},"body":"test","platforms":null,"tags":null,"tagString":""},{"id":4,"createdAt":"0001-01-01T00:00:00Z","modifiedAt":"0001-01-01T00:00:00Z","deletedAt":{"Time":"0001-01-01T00:00:00Z","Valid":false},"title":"test","description":"test","link":"test","date":{"Time":"2023-01-01T00:00:00Z","Valid":true},"body":"test","platforms":null,"tags":null,"tagString":""},{"id":5,"createdAt":"0001-01-01T00:00:00Z","modifiedAt":"0001-01-01T00:00:00Z","deletedAt":{"Time":"0001-01-01T00:00:00Z","Valid":false},"title":"test","description":"test","link":"test","date":{"Time":"2023-01-01T00:00:00Z","Valid":true},"body":"test","platforms":null,"tags":null,"tagString":""},{"id":6,"createdAt":"0001-01-01T00:00:00Z","modifiedAt":"0001-01-01T00:00:00Z","deletedAt":{"Time":"0001-01-01T00:00:00Z","Valid":false},"title":"test","description":"test","link":"test","date":{"Time":"2023-01-01T00:00:00Z","Valid":true},"body":"test","platforms":null,"tags":null,"tagString":""}]}`,
 		},
 	}
 
