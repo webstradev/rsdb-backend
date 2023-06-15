@@ -89,6 +89,13 @@ spec:
     http:
       paths:
       - pathType: Prefix
+        path : "/"
+        backend:
+          service:
+            name: rsdb-dev-frontend-service
+            port:
+              number: 80
+      - pathType: Prefix
         path: "/api"
         backend:
           service:
