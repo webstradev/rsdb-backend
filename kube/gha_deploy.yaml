@@ -1,0 +1,43 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: gha-clusterrole 
+rules:
+  - apiGroups:
+      - apps
+    resources:
+      - deployments
+      - namespaces
+    verbs:
+      - create
+      - get
+      - list
+      - patch
+      - watch
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: github-actions
+  labels:
+    name: github-actions
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: rsdb-deploy
+  namespace: github-actions
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: rsdb-deployment-rb 
+  namespace: rsdb 
+subjects:
+  - kind: ServiceAccount
+    name: rsdb-deploy 
+    namespace: github-actions
+roleRef:
+  kind: ClusterRole 
+  name: gha-clusterrole 
+  apiGroup: rbac.authorization.k8s.io

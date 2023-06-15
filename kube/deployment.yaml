@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
       - name: rsdb-backend-container
-        image: webstradev/rsdb-backend:latest
+        image: __DOCKER_IMAGE__ 
         envFrom:
             - secretRef:
                 name: rsdb-secrets

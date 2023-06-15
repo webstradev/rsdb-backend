@@ -22,14 +22,7 @@ build_docker:
 	@echo "Pushing docker image..."
 	@docker push webstradev/rsdb-backend:latest
 
-deploy-prod:
-	@echo "Deleting old k8s production deployment"
-	-@kubectl delete deployment rsdb-backend -n rsdb
-	@echo "Deploying new k8s production deployment"
-	@kubectl apply -f kube/deployment.yaml
-	@echo "Done!"
-
-deploy:
+deploy-dev:
 	@echo "Deleting old k8s deployment"
 	-@kubectl delete deployment rsdb-dev-backend -n rsdb
 	@echo "Deploying new k8s deployment"
@@ -37,8 +30,5 @@ deploy:
 	@echo "Done!"
 
 
-dev: build_docker deploy
-	@echo "Done!"
-
-prod: build_docker deploy-prod
+dev: build_docker deploy-dev
 	@echo "Done!"

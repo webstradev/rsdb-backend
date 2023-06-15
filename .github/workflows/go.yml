@@ -1,0 +1,59 @@
+name: CI/CD
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: 1.20.0
+
+    - name: Test
+      run: make test
+
+  build:
+    needs: test
+    name: Build and Push Docker Image
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    - name: Build Docker Image
+      run: |
+        docker build -t ${{ vars.DOCKER_HUB_USERNAME }}/${{ vars.DOCKER_IMAGE_NAME }}:${{ github.sha }} .
+    - name: Login to Docker Hub
+      run: echo ${{ secrets.DOCKER_HUB_PASSWORD }} | docker login -u ${{ vars.DOCKER_HUB_USERNAME }} --password-stdin
+    - name: Push Docker Image
+      run: docker push ${{ vars.DOCKER_HUB_USERNAME }}/${{ vars.DOCKER_IMAGE_NAME }}:${{ github.sha }}
+
+  deploy:
+    needs: [test, build]
+    name: Deploy to Kubernetes
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set the Kubernetes context
+        uses: azure/k8s-set-context@v3
+        with:
+          method: service-account
+          k8s-url: ${{ secrets.KUBERNETES_URL }}
+          k8s-secret: ${{ secrets.KUBERNETES_SECRET }}
+      
+      - name: Checkout source code
+        uses: actions/checkout@v3        
+      
+      - name: Set docker image in deployment file
+        run: sed -i "s#__DOCKER_IMAGE__#'${{ vars.DOCKER_HUB_USERNAME }}/${{ vars.DOCKER_IMAGE_NAME }}:${{ github.sha }}'#" ./kube/deployment.yaml
+
+      - name: Deploy to the Kubernetes cluster
+        run: |
+          kubectl apply -f ./kube/deployment.yaml
+          kubectl rollout status -f ./kube/deployment.yaml -w
