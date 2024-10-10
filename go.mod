@@ -3,7 +3,7 @@ module github.com/webstradev/rsdb-backend
 go 1.23
 
 require (
-	github.com/gin-contrib/cors v1.4.0
+	github.com/gin-contrib/cors v1.6.0
 	github.com/gin-gonic/gin v1.10.0
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/golang-jwt/jwt v3.2.2+incompatible
@@ -12,6 +12,8 @@ require (
 	github.com/stretchr/testify v1.9.0
 	golang.org/x/crypto v0.28.0
 )
+
+require github.com/kr/text v0.2.0 // indirect
 
 require (
 	github.com/bytedance/sonic/loader v0.2.0 // indirect
