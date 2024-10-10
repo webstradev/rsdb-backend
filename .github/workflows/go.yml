@@ -10,12 +10,12 @@ jobs:
     name: Run Tests
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Set up Go
-      uses: actions/setup-go@v3
+      uses: actions/setup-go@v5
       with:
-        go-version: 1.20.0
+        go-version: 1.23
 
     - name: Test
       run: make test
@@ -26,7 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: Build Docker Image
       run: |
         docker build -t ${{ vars.DOCKER_HUB_USERNAME }}/${{ vars.DOCKER_IMAGE_NAME }}:${{ github.sha }} .
@@ -48,7 +48,7 @@ jobs:
           k8s-secret: ${{ secrets.KUBERNETES_SECRET }}
       
       - name: Checkout source code
-        uses: actions/checkout@v3        
+        uses: actions/checkout@v4        
       
       - name: Set docker image in deployment file
         run: sed -i "s#__DOCKER_IMAGE__#'${{ vars.DOCKER_HUB_USERNAME }}/${{ vars.DOCKER_IMAGE_NAME }}:${{ github.sha }}'#" ./kube/deployment.yaml
