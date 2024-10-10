@@ -34,26 +34,3 @@ jobs:
       run: echo ${{ secrets.DOCKER_HUB_PASSWORD }} | docker login -u ${{ vars.DOCKER_HUB_USERNAME }} --password-stdin
     - name: Push Docker Image
       run: docker push ${{ vars.DOCKER_HUB_USERNAME }}/${{ vars.DOCKER_IMAGE_NAME }}:${{ github.sha }}
-
-  deploy:
-    needs: [test, build]
-    name: Deploy to Kubernetes
-    runs-on: ubuntu-latest
-    steps:
-      - name: Set the Kubernetes context
-        uses: azure/k8s-set-context@v3
-        with:
-          method: service-account
-          k8s-url: ${{ secrets.KUBERNETES_URL }}
-          k8s-secret: ${{ secrets.KUBERNETES_SECRET }}
-      
-      - name: Checkout source code
-        uses: actions/checkout@v4        
-      
-      - name: Set docker image in deployment file
-        run: sed -i "s#__DOCKER_IMAGE__#'${{ vars.DOCKER_HUB_USERNAME }}/${{ vars.DOCKER_IMAGE_NAME }}:${{ github.sha }}'#" ./kube/deployment.yaml
-
-      - name: Deploy to the Kubernetes cluster
-        run: |
-          kubectl apply -f ./kube/deployment.yaml
-          kubectl rollout status -f ./kube/deployment.yaml -w
