@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/webstradev/gin-pagination/v2/pkg/pagination"
 	"github.com/webstradev/rsdb-backend/controllers"
 	"github.com/webstradev/rsdb-backend/controllers/articles"
 	"github.com/webstradev/rsdb-backend/controllers/platforms"
@@ -51,7 +52,7 @@ func registerRoutes(env *utils.Environment) *gin.Engine {
 	api.GET("/counts", controllers.GetCounts(env))
 
 	// Platforms
-	api.GET("/platforms", middlewares.PaginationMiddleware(), platforms.GetPlatforms(env))
+	api.GET("/platforms", pagination.New(pagination.WithSizeText("pageSize"), pagination.WithMinPageSize(1), pagination.WithMaxPageSize(100)), platforms.GetPlatforms(env))
 	api.POST("/platforms", platforms.CreatePlatform(env))
 	api.GET("/platforms/:platformId", platforms.GetPlatform(env))
 	api.PUT("/platforms/:platformId", platforms.EditPlatform(env))
@@ -64,14 +65,28 @@ func registerRoutes(env *utils.Environment) *gin.Engine {
 	api.DELETE("/platforms/:platformId/contacts/:id", platforms.DeleteContact(env))
 
 	// Articles
-	api.GET("/articles", middlewares.PaginationMiddleware(), articles.GetArticles(env))
+	api.GET("/articles",
+		pagination.New(
+			pagination.WithSizeText("pageSize"),
+			pagination.WithMinPageSize(1),
+			pagination.WithMaxPageSize(100),
+		),
+		articles.GetArticles(env),
+	)
 	api.POST("/articles", articles.CreateArticle(env))
 	api.GET("/articles/:articleId", articles.GetArticle(env))
 	api.PUT("/articles/:articleId", articles.EditArticle(env))
 	api.DELETE("/articles/:articleId", articles.DeleteArticle(env))
 
 	// Projects
-	api.GET("/projects", middlewares.PaginationMiddleware(), projects.GetProjects(env))
+	api.GET("/projects",
+		pagination.New(
+			pagination.WithSizeText("pageSize"),
+			pagination.WithMinPageSize(1),
+			pagination.WithMaxPageSize(100),
+		),
+		projects.GetProjects(env),
+	)
 	api.POST("/projects", projects.CreateProject(env))
 	api.GET("/projects/:projectId", projects.GetProject(env))
 	api.PUT("/projects/:projectId", projects.EditProject(env))

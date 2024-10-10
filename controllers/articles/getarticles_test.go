@@ -12,7 +12,7 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/require"
-	"github.com/webstradev/rsdb-backend/middlewares"
+	"github.com/webstradev/gin-pagination/v2/pkg/pagination"
 	"github.com/webstradev/rsdb-backend/utils"
 )
 
@@ -103,7 +103,7 @@ func TestGetArticles(t *testing.T) {
 			require.NoError(t, err)
 
 			// Register handler
-			r.GET("/api/articles", middlewares.PaginationMiddleware(), GetArticles(env))
+			r.GET("/api/articles", pagination.New(pagination.WithSizeText("pageSize"), pagination.WithMinPageSize(1), pagination.WithMaxPageSize(100)), GetArticles(env))
 
 			// Create httptest request
 			req, _ := http.NewRequest("GET", fmt.Sprintf("/api/articles?page=%d&pageSize=%d", test.Page, test.PageSize), nil)
